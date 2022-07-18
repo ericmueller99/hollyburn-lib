@@ -6,7 +6,6 @@ import {useForm, Controller, useWatch} from 'react-hook-form';
 import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
-import "../styles/index.css";
 
 export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, setFormCompleted}) {
 

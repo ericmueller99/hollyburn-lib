@@ -22,14 +22,14 @@ module.exports = {
                     loader: 'babel-loader'
                 }
             },
-            {
-                test:[ /react-datepicker.css/],
-                use: [MiniCssExtractPlugin.loader, 'css-loader']
-            },
+            // {
+            //     test:[ /react-datepicker.css/],
+            //     use: [MiniCssExtractPlugin.loader, 'css-loader']
+            // },
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
-                exclude: /react-datepicker.css/
+                use: ["css-loader", "postcss-loader"],
+                // exclude: /react-datepicker.css/
             },
         ],
     },
