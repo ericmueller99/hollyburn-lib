@@ -6,6 +6,7 @@ const libraryName= pkg.name;
 module.exports = {
     entry: "./src/index.js",
     output: {
+        globalObject: "this",
         path: path.join(__dirname, './dist'),
         filename: 'index.js',
         library: libraryName,
