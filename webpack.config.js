@@ -7,7 +7,7 @@ module.exports = {
     entry: "./src/index.js",
     output: {
         globalObject: "this",
-        path: path.join(__dirname, './dist'),
+        path: path.join(__dirname, './dist/esm'),
         filename: 'index.js',
         library: libraryName,
         libraryTarget: 'umd',
