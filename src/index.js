@@ -1,6 +1,2 @@
 import "./index.css";
-import {Test} from './componets/test';
-
-export {
-    Test
-}
+export * from './componets/test';
