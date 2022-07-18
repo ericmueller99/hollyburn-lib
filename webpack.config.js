@@ -24,20 +24,7 @@ module.exports = {
             },
             {
                 test:[ /react-datepicker.css/],
-                use: [{
-                    loader: "style-loader"
-                },{
-                    loader: MiniCssExtractPlugin.loader,
-                    options: {
-                        sourceMap: true,
-                        publicPath: "../"
-                    }
-                }, {
-                    loader: "css-loader",
-                }, {
-                    loader: "postcss-loader"
-                }],
-                exclude:/src/
+                use: ["style-loader", "css-loader"]
             },
             {
                 test: /\.css$/,

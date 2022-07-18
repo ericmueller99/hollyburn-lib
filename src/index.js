@@ -1,6 +1,6 @@
 import "./index.css";
-import {Test} from './componets/test';
-import {QualifyForm} from "./componets/qualify-form";
+import {Test} from './components/test';
+import {QualifyForm} from "./components/qualify-form";
 
 export {
     QualifyForm, Test
