@@ -9,8 +9,8 @@ module.exports = {
     output: {
         filename: "index.js",
         path: path.resolve(__dirname, 'dist'),
-        library: 'Hollyburn-Lib',
-        libraryTarget: "commonjs"
+        library: 'hollyburn-Lib',
+        libraryTarget: "umb"
     },
     module: {
         rules: [
