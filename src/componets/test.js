@@ -1,7 +1,11 @@
 import React from 'react'
 
-export default function Test() {
+
+
+const Test = () => {
     return (
         <div>Testing 1234</div>
     )
 }
+
+export default Test;

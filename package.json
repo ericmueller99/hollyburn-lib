@@ -2,7 +2,7 @@
   "name": "hollyburn-lib",
   "version": "1.0.0",
   "description": "Library of Hollyburn assets",
-  "main": "./dist/index.js",
+  "main": "./dist/esm/index.js",
   "private": true,
   "scripts": {
     "build": "webpack --mode production"
