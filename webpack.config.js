@@ -24,11 +24,7 @@ module.exports = {
             },
             {
                 test: /react-datepicker.css/,
-                use: [{
-                    loader: "style-loader"
-                }, {
-                    loader: "css-loader"
-                }],
+                use: ['style-loader', 'css-loader'],
                 exclude: /src/
             },
             {

@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import Image from "next/image";
+import Image from "next/image";
 import {useForm, Controller, useWatch} from 'react-hook-form';
 import moment from 'moment';
 import axios from "axios";
@@ -142,7 +142,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             {/*loading widget*/}
             <div className={isLoading ? 'block' : 'hidden'}>
                 <div className={"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"} style={{zIndex:500}}>
-                    {/*<Image src={"/images/loading.gif"} height={150} width={150} priority={true} />*/}
+                    <Image src={"/images/loading.gif"} height={150} width={150} priority={true} />
                 </div>
                 <div className={"w-full h-full bg-hbLightGray absolute top-0 left-0 opacity-60 z-40"}>
 
