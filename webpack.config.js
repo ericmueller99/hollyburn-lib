@@ -4,10 +4,11 @@ const pkg = require('./package.json');
 const libraryName= pkg.name;
 
 module.exports = {
+    mode: 'development',
     entry: "./src/index.js",
     output: {
         globalObject: "this",
-        path: path.join(__dirname, './dist/esm'),
+        path: path.join(__dirname, './dist'),
         filename: 'index.js',
         library: libraryName,
         libraryTarget: 'umd',
