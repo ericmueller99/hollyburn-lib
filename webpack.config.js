@@ -1,19 +1,16 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const path = require("path");
-const pkg = require('./package.json');
-const libraryName= pkg.name;
 
 module.exports = {
     mode: 'development',
     entry: "./src/index.js",
     output: {
-        globalObject: "this",
-        path: path.join(__dirname, './dist'),
-        filename: 'index.js',
-        library: libraryName,
-        libraryTarget: 'umd',
-        publicPath: '/dist/',
-        umdNamedDefine: true
+        filename: "index.js",
+        path: path.resolve(__dirname, 'dist'),
+        library: 'Hollyburn-Lib',
+        libraryTarget: "commonjs"
     },
     module: {
         rules: [
@@ -35,28 +32,10 @@ module.exports = {
         ],
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: 'index.css'
         }),
     ],
-    resolve: {
-        alias: {
-            'react': path.resolve(__dirname, './node_modules/react'),
-            'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
-        }
-    },
-    externals: {
-        react: {
-            commonjs: "react",
-            commonjs2: "react",
-            amd: "React",
-            root: "React"
-        },
-        "react-dom": {
-            commonjs: "react-dom",
-            commonjs2: "react-dom",
-            amd: "ReactDOM",
-            root: "ReactDOM"
-        }
-    }
+    externals: [nodeExternals()]
 }

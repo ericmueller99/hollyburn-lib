@@ -1,11 +1,11 @@
 {
   "name": "hollyburn-lib",
   "version": "1.0.0",
-  "description": "Library of Hollyburn assets.-",
+  "description": "Library of Hollyburn assets",
   "main": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "webpack"
+    "build": "webpack --mode production"
   },
   "author": "Eric Mueller",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "@babel/preset-react": "^7.18.6",
     "autoprefixer": "^10.4.7",
     "babel-loader": "^8.2.5",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
@@ -26,7 +27,8 @@
     "tailwindcss": "^3.1.6",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.3"
+    "webpack-dev-server": "^4.9.3",
+    "webpack-node-externals": "^3.0.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
