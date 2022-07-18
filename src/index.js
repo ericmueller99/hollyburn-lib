@@ -1,7 +1,6 @@
-import "./index.css";
-import {Test} from './components/test';
+import "./styles/global.css";
 import {QualifyForm} from "./components/qualify-form";
 
 export {
-    QualifyForm, Test
+    QualifyForm,
 }

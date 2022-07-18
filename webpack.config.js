@@ -24,7 +24,7 @@ module.exports = {
             },
             {
                 test:[ /react-datepicker.css/],
-                use: ["style-loader", "css-loader"]
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             },
             {
                 test: /\.css$/,
@@ -35,9 +35,7 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new MiniCssExtractPlugin({
-            filename: 'index.css'
-        }),
+        new MiniCssExtractPlugin(),
     ],
     externals: [nodeExternals()],
     resolve: {
