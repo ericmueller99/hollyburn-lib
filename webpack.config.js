@@ -10,7 +10,8 @@ module.exports = {
         filename: "index.js",
         path: path.resolve(__dirname, 'dist'),
         library: 'hollyburn-Lib',
-        libraryTarget: "umd"
+        libraryTarget: "umd",
+        globalObject: 'this'
     },
     module: {
         rules: [
@@ -37,5 +38,5 @@ module.exports = {
             filename: 'index.css'
         }),
     ],
-    externals: [nodeExternals()]
+    externals: [nodeExternals()],
 }
