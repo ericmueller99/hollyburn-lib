@@ -1,3 +1,7 @@
 import "./index.css";
-export {Test} from './componets/test';
-export {QualifyForm} from './componets/qualify-form';
+import {Test} from './componets/test';
+import {QualifyForm} from "./componets/qualify-form";
+
+export {
+    QualifyForm, Test
+}
