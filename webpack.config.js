@@ -35,7 +35,9 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin({
+            filename: 'index.css'
+        }),
     ],
     externals: [nodeExternals()],
     resolve: {

@@ -1,4 +1,4 @@
-import "./styles/global.css";
+import "./styles/index.css";
 import {QualifyForm} from "./components/qualify-form";
 
 export {
