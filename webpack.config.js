@@ -4,7 +4,7 @@ const nodeExternals = require('webpack-node-externals');
 const path = require("path");
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: "./src/index.js",
     output: {
         filename: "index.js",
@@ -23,12 +23,17 @@ module.exports = {
                 }
             },
             {
+                test: /react-datepicker.css/,
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }],
+                exclude: /src/
+            },
+            {
                 test: /\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    "css-loader",
-                    "postcss-loader",
-                ],
+                use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
             },
         ],
     },
@@ -39,4 +44,7 @@ module.exports = {
         }),
     ],
     externals: [nodeExternals()],
+    resolve: {
+        extensions: ['.js', '.css', '.jsx']
+    }
 }
