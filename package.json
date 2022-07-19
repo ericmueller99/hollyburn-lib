@@ -20,6 +20,7 @@
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",
     "@storybook/addon-links": "^6.5.9",
+    "@storybook/addon-postcss": "^2.0.0",
     "@storybook/builder-webpack5": "^6.5.9",
     "@storybook/manager-webpack5": "^6.5.9",
     "@storybook/react": "^6.5.9",
@@ -54,5 +55,8 @@
     "moment": "^2.29.4",
     "react-datepicker": "^4.8.0",
     "react-hook-form": "^7.33.1"
+  },
+  "resolutions": {
+    "webpack": "^5"
   }
 }

@@ -33,17 +33,14 @@ const menuItems = [
     {
         name: "Blog",
         link: "https://www.hollyburn.com/blog/",
-        subMenu: []
     },
     {
         name: "Contact Hollyburn",
         link: "https://www.hollyburn.com/contact/",
-        subMenu: []
     },
     {
         name: "Resident Log In",
         link: "https://residentportal.hollyburn.com/login/",
-        subMenu: []
     }
 ]
 
@@ -62,7 +59,7 @@ export function Header() {
                                 <div className="flex-shrink-0 flex items-center max-w-md lg:max-w-full">
                                     <div className={"hidden lg:flex"}>
                                         <a href={"https://www.hollyburn.com"}>
-                                            <Image src={"/images/logo.svg"} alt={"Hollyburn Properties"} width={175} height={100} />
+                                            <Image src="/images/logo.svg" alt={"Hollyburn Properties"} width={175} height={100} />
                                         </a>
                                     </div>
                                     <div className={"lg:hidden flex"}>
@@ -78,18 +75,28 @@ export function Header() {
                                 {menuItems.map(e => (
                                     <Menu as={"div"} className={"relative hidden text-hbGray lg:inline-flex hover:border-b-hbOrange hover:border-b-2 p-2 h-10 mx-1 lg:px-1"} key={e.name}>
                                         <Menu.Button>
-                                            {e.name}
+                                            {
+                                                e.subMenu ? e.name :
+                                                <a href={e.link} target="_blank">{e.name}</a>
+                                            }
                                         </Menu.Button>
 
-                                        <Transition>
-                                            <Menu.Items className={"absolute left-0 w-56 mt-10 bg-white text-left p-4 z-50"}>
-                                                {e.subMenu.map(e => (
-                                                    <div key={e.name}>
-                                                        <a href={e.link} className={"hover:bg-hbLightGray w-full inline-block p-2"}>{e.name}</a>
-                                                    </div>
-                                                ))}
-                                            </Menu.Items>
-                                        </Transition>
+                                        {
+                                            e.subMenu ?
+
+                                                <Transition>
+                                                    <Menu.Items className={"absolute left-0 w-56 mt-10 bg-white text-left p-4 z-50"}>
+                                                        {e.subMenu.map(e => (
+                                                            <div key={e.name}>
+                                                                <a href={e.link} className={"hover:bg-hbLightGray w-full inline-block p-2"}>{e.name}</a>
+                                                            </div>
+                                                        ))}
+                                                    </Menu.Items>
+                                                </Transition>
+
+                                                : null
+
+                                        }
 
                                     </Menu>
                                 ))}
