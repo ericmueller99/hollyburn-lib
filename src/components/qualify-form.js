@@ -7,7 +7,7 @@ import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
 
-export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, setFormCompleted}) {
+export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, setFormCompleted, submitUrl = '/api/submit'}) {
 
     //form options.  Later this can be updated to a CRM or API endpoint.  For now this is fine.
     const occupantOptions = [
@@ -120,7 +120,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         //send the request to the api endpoint
         setHasCriticalError(false);
         setIsLoading(true);
-        axios.post('/api/submit', data)
+        axios.post(submitUrl, data)
             .then(res => {
                 console.log(res);
                 setIsLoading(false);

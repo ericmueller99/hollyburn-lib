@@ -11,6 +11,10 @@ module.exports = {
         'fontGray': "#868686",
         'hbBlue': '#003976'
       },
+      backgroundImage: {
+        'qualifyCard': "url('/images/sidebar-img.jpg')",
+        'footerHero': 'url(/images/footer-img.jpg)'
+      }
     },
   },
   plugins: [],
