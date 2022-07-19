@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import React from "react";
 
 export function ThankYou({message = <>Thank you for your submission!<br />If requested one of our representative will be in touch with you soon.</>}) {
 
