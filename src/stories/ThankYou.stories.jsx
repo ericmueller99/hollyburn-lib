@@ -5,9 +5,7 @@ export default {
     title: 'Thank You',
     component: ThankYou,
     argsTypes: {
-        message: {
-            control: {type: 'text'}
-        }
+
     }
 }
 

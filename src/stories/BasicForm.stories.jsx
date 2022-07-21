@@ -1,13 +1,10 @@
 import React from 'react';
-import {QualifyForm} from "../components/qualify-form";
+import {BasicForm} from "../components/basic-form";
 
 export default {
-    title: 'Qualify Form',
-    component: QualifyForm,
+    title: 'Basic Form',
+    component: BasicForm,
     argTypes: {
-        maxBudget: {
-            control: {type: 'number', min: 0, max: 9999}
-        },
         firstName: {
             control: {type: 'text'}
         },
@@ -15,15 +12,13 @@ export default {
             control: {type: 'text'}
         },
         emailAddress: {
-            control: {
-                type: 'text'
-            }
+            control: {type: 'text'}
         },
         phoneNumber: {
             control: {type: 'text'}
         },
-        submitUrl: {
-            control: {type: 'text'}
+        options: {
+            control: {type: 'object'}
         }
     }
 }
@@ -31,9 +26,16 @@ export default {
 const Template = (args) => {
     return (
         <div className={"bg-hbLightGray"}>
-            <QualifyForm {...args} />
+            <BasicForm {...args} />
         </div>
     )
 }
 export const Standard = Template.bind({});
 Standard.args = {};
+
+export const Wizard = Template.bind({})
+Wizard.args = {
+    options: {
+        buttonText: 'Next'
+    }
+}

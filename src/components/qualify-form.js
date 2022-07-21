@@ -9,7 +9,7 @@ import {XCircleIcon} from "@heroicons/react/solid";
 
 export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, setFormCompleted, submitUrl = '/api/submit'}) {
 
-    //form options.  Later this can be updated to a CRM or API endpoint.  For now this is fine.
+    //TODO update these to pull from Salesforce
     const occupantOptions = [
         {label: 1, value: 1},
         {label: 2, value: 2},
@@ -155,17 +155,17 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*First Name*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"first-name"} className={"block text-sm font-medium text-gray-900"}>*First Name</label>
+                    <label htmlFor={"firstName"} className={"block text-sm font-medium text-gray-900"}>*First Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('firstName', {required: true, maxLength: 50})}
                                className={textInputClasses} value={firstName} />
-                        {errors.firstName && <p className={"text-red-600"}>First name is a required.</p>}
+                        {errors.firstName && <p className={"text-red-600"}>First name is required.</p>}
                     </div>
                 </div>
 
                 {/*Last Name*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"last-name"} className={"block text-sm font-medium text-gray-900"}>*Last Name</label>
+                    <label htmlFor={"lastName"} className={"block text-sm font-medium text-gray-900"}>*Last Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('lastName', {required: true, maxLength: 50})}
                                className={textInputClasses} value={lastName} />
