@@ -2,18 +2,14 @@ import React from 'react';
 import {useForm, useWatch, useController} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon} from "@heroicons/react/solid";
 
-export function BookAViewing() {
+export function BookAViewing({vacancyId}) {
 
-    const propertyOptions = [
-        {value: 12, label: 'Harbourview'},
-        {value: 13, label: 'Somerset'}
-    ];
+    const [refreshFeed, setRefreshFeed] = React.useState(true);
+    const [vacancyFeed, setVacancyFeed] = React.useState([]);
+    const [propertyOptions, setPropertyOptions] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(false);
     const {control, watch, register, handleSubmit, formState: {errors}, setErrors} = useForm()
-    const [suiteOptions, setSuiteOptions] = React.useState([
-        {value: 12, name: '00706', available: '2022-08-01', askingRent: 2400, description: '1 Bedroom with small patio located on the 4th floor.'},
-        {value: 13, name: '00703', available: '2022-09-01', askingRent: 1800, description: '2 Bedroom unit with in-suite laundry etc.'}
-    ])
+    const [suiteOptions, setSuiteOptions] = React.useState([]);
     const suiteWatch = watch('suites');
     const [dayOptions, setDayOptions] = React.useState([
         {label: 'July 21st 2022', value: '2022-07-22', availableSlots: 4},
@@ -22,31 +18,103 @@ export function BookAViewing() {
         {label: 'July 24th 2022', value: '2022-07-25', availableSlots: 2}
     ])
     const dayWatch = watch('date');
+    const propertyWatch = watch('property');
 
+    //get the vacancy feed.  this contains properties and all vacant units that we can use to populate the form.
+    React.useEffect(() => {
+
+        if (!refreshFeed) {
+            return;
+        }
+
+        console.log('getting vacancy feed!');
+        setIsLoading(true);
+        setRefreshFeed(false);
+        fetch('https://api.hollyburn.com/properties/vacancies')
+            .then(res => res.json())
+            .then(data => {
+                setVacancyFeed(data);
+                setIsLoading(false);
+            })
+            .catch(error => {
+                setIsLoading(false);
+                console.log(error);
+            })
+
+    }, [refreshFeed]);
+
+    //the vacancy feed data has been refreshed.
+    React.useEffect(() => {
+        const properties = vacancyFeed.filter(p => p.hasVacancy).map(p => {
+            return {
+                label: p.propertyName,
+                value: p.propertyHMY
+            }
+        });
+        setPropertyOptions(properties);
+    }, [vacancyFeed])
+
+    //property has been changed
+    React.useEffect(() => {
+
+        const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
+        const {vacancies} = selectedProperty || [];
+        setSuiteOptions(vacancies);
+
+    }, [propertyWatch])
+
+    //when a property is select.  this will get and return the suites available for it.
+    function AvailableSuites({control}) {
+
+        if (!suiteOptions) {
+            return '';
+        }
+
+        console.log('hello');
+        console.log(suiteOptions);
+        console.log(suiteWatch);
+
+        let suiteWatchCleaned = suiteWatch || [];
+        if (!Array.isArray(suiteWatchCleaned)) {
+            suiteWatchCleaned = [suiteWatchCleaned];
+        }
+        suiteWatchCleaned = suiteWatchCleaned.map(s => Number(s));
+
+        return (
+            <div className={"col-span-2"}>
+                <fieldset>
+                    <p>
+                        Choose suites that match your preference. <br />
+                        <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
+                    </p>
+                    <div className={"mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4"}>
+                        {
+                            suiteOptions.map(s => (
+                                <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
+                                    <input type="checkbox" name="suites" value={s.vacancyId} className={"sr-only"} {...register('suites', {required: true})} />
+                                    <span className={"flex-1 flex"}>
+                                        <span className={"flex flex-col"}>
+                                            <CheckCircleIcon className={`${suiteWatchCleaned.includes(s.vacancyId) ? 'h-7 w-7 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2' : 'hidden'}`} />
+                                            <span className={"block text-sm font-medium text-gray-900"}>Unit: {s.unitNumber} - ${s.askingRent} monthly</span>
+                                            <span className={"block text-sm font-medium text-gray-900"}>Available: <span className={"text-hbGray"}>{s.availableDate}</span></span>
+                                        </span>
+                                    </span>
+                                </label>
+                            ))
+                        }
+                    </div>
+                    {errors.suites && <p className={"text-red-600"}>Choose atleast one suite type</p>}
+                </fieldset>
+            </div>
+        )
+    }
+
+    //form submission
     const onSubmit = (data) => {
         console.log(data);
     }
 
-    React.useEffect(() => {
-
-        if (!Array.isArray(suiteOptions) || !suiteWatch) {
-            return;
-        }
-
-        const suiteWatchConverted = suiteWatch.map(s => Number(s));
-        let newSuiteOptions = [...suiteOptions];
-        for (let suite of newSuiteOptions) {
-            if (suiteWatchConverted.includes(suite.value)) {
-                suite.selected = true;
-            }
-            else {
-                delete suite.selected;
-            }
-        }
-        setSuiteOptions(newSuiteOptions);
-
-    }, [suiteWatch]);
-
+    //tailwind classes for the text boxes.
     const textInputClasses = 'py-3 px-4 block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md';
 
     return (
@@ -64,7 +132,7 @@ export function BookAViewing() {
 
                 {/*Step 1 - Select a Property*/}
                 <div className={"col-span-2"}>
-                    <label htmlFor={"property"} className={"block text-sm font-medium text-hbGray mb-3"}>Select a Property</label>
+                    <label htmlFor={"property"} className={"block text-sm font-medium text-hbGray mb-3"}>Select a Property <br/> <span className={"text-xs"}>(Only properties with vacancies are displayed)</span> </label>
                     <select className={textInputClasses} {...register('property', {required: true})} defaultValue={"Please Select..."}>
                         <option value={"Please Select..."} disabled>Please Select...</option>
                         {
@@ -76,33 +144,7 @@ export function BookAViewing() {
                 </div>
 
                 {/*Step 2 - Choose Available Suites*/}
-                <div className={"col-span-2"}>
-                    <fieldset>
-                        <p>
-                            Choose suites that match your preference. <br />
-                            <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
-                        </p>
-                        <div className={"mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4"}>
-                            {
-                                suiteOptions.map(s => (
-                                    <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${s.selected ? 'border border-hbBlue' : ''}`}>
-                                        <input type="checkbox" name="suites" value={s.value} className={"sr-only"} {...register('suites', {required: true})} />
-                                        <span className={"flex-1 flex"}>
-                                        <span className={"flex flex-col"}>
-                                            <CheckCircleIcon className={`${s.selected ? 'h-7 w-7 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2' : 'hidden'}`} />
-                                            <span className={"block text-sm font-medium text-gray-900"}>Unit: {s.name} - ${s.askingRent} monthly</span>
-                                            <span className={"block text-sm font-medium text-gray-900"}>Available: <span className={"text-hbGray"}>{s.available}</span></span>
-                                            <span className={"block text-sm font-medium text-gray-900"}>{s.description}</span>
-                                        </span>
-                                    </span>
-                                    </label>
-                                ))
-                            }
-                        </div>
-                        {errors.suites && <p className={"text-red-600"}>Choose atleast one suite type</p>}
-
-                    </fieldset>
-                </div>
+                <AvailableSuites control={control} />
 
                 {/*Step 3 - Choose date */}
                 <div className={"col-span-2"}>
