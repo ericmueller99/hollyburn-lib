@@ -1,4 +1,4 @@
-import React from "@types/react";
+import React from 'react';
 
 export function LoadingWidget({isLoading = false}) {
     return (
