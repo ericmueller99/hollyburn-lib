@@ -1,38 +1,7 @@
-import React, {useMemo} from 'react';
+import React  from 'react';
 import {useForm, useWatch, useController} from 'react-hook-form';
-import {CheckCircleIcon, XCircleIcon} from "@heroicons/react/solid";
+import {CheckCircleIcon} from "@heroicons/react/solid";
 import moment from "moment";
-
-const getAsync = (asyncCallback) => {
-    const [state, setState] = React.useState(null);
-    React.useEffect(() => {
-        const promise = asyncCallback();
-        if (!promise) {
-            return;
-        }
-        promise
-            .then(res => res.json())
-            .then(data => {
-                setState(data)
-            })
-            .catch(error => {
-                console.log(error);
-            })
-    }, [asyncCallback])
-    return state;
-}
-
-const eqSet = (as, bs) => {
-    if (as.size !== bs.size) {
-        return false;
-    }
-    for (const a of as) {
-        if (!bs.has(a)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 //format the date into yyyy-mm-dd for the api endpoint
 const formatDate = (date) => {
@@ -55,7 +24,7 @@ export function BookAViewing({vacancyId}) {
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(false);
-    const {control, watch, register, handleSubmit, formState: {errors}, setErrors, setValue} = useForm()
+    const {control, watch, register, handleSubmit, formState: {errors}, setErrors, setValue, resetField} = useForm()
     const [suiteOptions, setSuiteOptions] = React.useState([]);
     const suiteWatch = watch('suites');
     const [dayOptions, setDayOptions] = React.useState([]);
@@ -96,15 +65,43 @@ export function BookAViewing({vacancyId}) {
             }
         });
         setPropertyOptions(properties);
+        if (vacancyId) {
+            try {
+                if (Number(vacancyId)) {
+                    //trying to find the vacancy
+                    let vacancy;
+                    const [property] = vacancyFeed.filter(p => {
+                        if (p.vacancies && p.vacancies.length > 0) {
+                            for (const v of p.vacancies) {
+                                if (v.vacancyId === parseInt(vacancyId)) {
+                                    vacancy = v;
+                                    return true;
+                                }
+                            }
+                        }
+                    })
+                    if (property && vacancy) {
+                        setValue('property', property.propertyHMY)
+                        setValue('suites', [vacancy.vacancyId]);
+                    }
+                }
+            }
+            catch (e) {
+                console.log('unable to load from vacancyId');
+                console.log(e);
+            }
+        }
     }, [vacancyFeed])
 
     //property has been changed
     React.useEffect(() => {
+        resetField('suites');
         const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
         const {vacancies} = selectedProperty || [];
         setSuiteOptions(vacancies);
-        setDayOptions([])
-        setValue('suites', []);
+        resetField('suites');
+        resetField('date');
+        resetField('timeslot');
     }, [propertyWatch])
 
     //day options.
@@ -135,6 +132,8 @@ export function BookAViewing({vacancyId}) {
         }
 
         setIsLoading(true);
+        resetField('timeslot');
+        resetField('date');
 
         //format the startDate and endDate time
         const currentDate = new Date();
@@ -183,13 +182,15 @@ export function BookAViewing({vacancyId}) {
             return;
         }
 
+        resetField('timeslot')
+
         //finding the timeslots that match the selected day.
         const [{timeSlots}] = dayOptions.filter(d => d.value === dayWatch);
         if (timeSlots) {
             const timeSlotOptions = timeSlots.map((t, index) => {
                 return {
-                    start: moment(t.start).format('h:m A'),
-                    end: moment(t.end).format('h:m A'),
+                    start: moment(t.start).format('h:mm A'),
+                    end: moment(t.end).format('h:mm A'),
                     key: index,
                     value: `${t.start}-${t.end}`,
                 }

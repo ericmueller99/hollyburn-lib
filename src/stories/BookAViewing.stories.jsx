@@ -4,7 +4,9 @@ export default {
     title: 'Book A Viewing',
     component: BookAViewing,
     argTypes: {
-
+        vacancyId: {
+            control: {type: 'text'}
+        }
     }
 }
 
