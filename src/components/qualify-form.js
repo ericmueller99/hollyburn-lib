@@ -7,7 +7,7 @@ import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
 
-export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, setFormCompleted, submitUrl = '/api/submit'}) {
+export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
 
     //TODO update these to pull from Salesforce
     const occupantOptions = [
@@ -44,6 +44,8 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {name: 'Etobicoke', value: 'Etobicoke', fieldName: 'etobicoke', inCity: 'Toronto'},
         {name: 'Yorkville', value: 'Yorkville', fieldName: 'yorkville', inCity: 'Toronto'},
     ];
+
+    const {buttonText = 'Submit', submitUrl = '/api/submit'} = options;
 
     function NeighbourhoodOptions({control}) {
 
@@ -124,14 +126,15 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             .then(res => {
                 console.log(res);
                 setIsLoading(false);
-                setFormCompleted(true);
+                const {id} = res;
+                data = {...data, formSubmissionId: id, result: true};
+                stateSetter(data);
             })
             .catch(error => {
                 setHasCriticalError(true);
                 setCriticalErrorMessage(error.response.data.errorMessage || "Unknown Error");
                 setIsLoading(false);
             })
-
     }
 
     //tailwind css classes for the form fields.
@@ -323,7 +326,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 <div className={"sm:col-span-2 sm:flex sm:justify-end"}>
                     <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
                         "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
-                        Submit
+                        {buttonText}
                     </button>
                 </div>
 

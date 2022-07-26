@@ -2,10 +2,10 @@ import React from 'react';
 import {useForm} from 'react-hook-form';
 import Image from "next/image";
 
-export function BasicForm({firstName = '', lastName = '', emailAddress = '', phoneNumber = '', options = {}}) {
+export function BasicForm({stateSetter, firstName = '', lastName = '', emailAddress = '', phoneNumber = '', options = {}}) {
 
     //options
-    const {submitUrl = '/api/submit', buttonText = 'Submit'} = options;
+    const {buttonText = 'Submit'} = options;
 
     //state management
     const [isLoading, setIsLoading] = React.useState(false);
@@ -18,8 +18,17 @@ export function BasicForm({firstName = '', lastName = '', emailAddress = '', pho
         }
     });
 
+    //submit the form.
     const onSubmit = (data) => {
-        console.log(data);
+        if (stateSetter && typeof stateSetter === 'function') {
+            data = {...data, result: true};
+            stateSetter(data);
+        }
+        else {
+            console.log('unable to set state.  stateSetter is not a function');
+            console.log('form state is:');
+            console.log(data);
+        }
     }
 
     //input box classes.

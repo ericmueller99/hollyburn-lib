@@ -5,8 +5,9 @@ import moment from "moment";
 import {formatDate} from "../lib/helpers";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
-export function BookAViewing({vacancyId, stateSetter}) {
+export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
+    const {buttonText = 'Submit'} = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
@@ -38,7 +39,7 @@ export function BookAViewing({vacancyId, stateSetter}) {
             })
             .catch(error => {
                 setIsLoading(false);
-                console.log(error);
+                throw error;
             })
 
     }, [refreshFeed]);
@@ -155,7 +156,7 @@ export function BookAViewing({vacancyId, stateSetter}) {
             })
             .catch(error => {
                 setIsLoading(false);
-                console.log(error);
+                throw error;
             })
 
 
@@ -370,6 +371,7 @@ export function BookAViewing({vacancyId, stateSetter}) {
 
         //constructing the state data.
         const stateData = {
+            result: true,
             property: Number(property),
             suites: vacancies,
             startDate: timeslot.split('to')[0],
@@ -394,9 +396,9 @@ export function BookAViewing({vacancyId, stateSetter}) {
 
             {/*Loading Widget*/}
             <div className={isLoading ? 'block' : 'hidden'}>
+                <div className={"w-full h-full bg-hbLightGray absolute top-0 left-0 opacity-60 z-40"}></div>
                 <div className={"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"} style={{zIndex: 400}}>
                     <img src="/images/loading.gif" height="150px" width="150px" alt="Loading..." />
-                    <div className={"w-full h-full bg-hbLightGray absolute top-0 left-0 opacity-60 z-40"}></div>
                 </div>
             </div>
 
@@ -429,7 +431,7 @@ export function BookAViewing({vacancyId, stateSetter}) {
                 <div className={"col-span-2 flex justify-end"}>
                     <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
                         "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
-                        Submit
+                        {buttonText}
                     </button>
                 </div>
 

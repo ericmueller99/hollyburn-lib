@@ -7,8 +7,8 @@ export default {
         vacancyId: {
             control: {type: 'text'}
         },
-        submitUrl: {
-            control: {type: 'text'}
+        options: {
+            control: {type: 'object'}
         }
     }
 }
