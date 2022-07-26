@@ -6,6 +6,9 @@ export default {
     argTypes: {
         vacancyId: {
             control: {type: 'text'}
+        },
+        submitUrl: {
+            control: {type: 'text'}
         }
     }
 }

@@ -1,30 +1,17 @@
 import React  from 'react';
-import {useForm, useWatch, useController} from 'react-hook-form';
-import {CheckCircleIcon} from "@heroicons/react/solid";
+import {useForm} from 'react-hook-form';
+import {CheckCircleIcon, XCircleIcon} from "@heroicons/react/solid";
 import moment from "moment";
+import {formatDate} from "../lib/helpers";
 
-//format the date into yyyy-mm-dd for the api endpoint
-const formatDate = (date) => {
-    let d = new Date(date);
-    let month = (d.getMonth() + 1).toString();
-    let day = d.getDate().toString();
-    let year = d.getFullYear();
-    if (month.length < 2) {
-        month = '0' + month;
-    }
-    if (day.length < 2) {
-        day = '0' + day;
-    }
-    return [year, month, day].join('-');
-}
-
-export function BookAViewing({vacancyId}) {
+//this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
+export function BookAViewing({vacancyId, stateSetter}) {
 
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(false);
-    const {control, watch, register, handleSubmit, formState: {errors}, setErrors, setValue, resetField} = useForm()
+    const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm()
     const [suiteOptions, setSuiteOptions] = React.useState([]);
     const suiteWatch = watch('suites');
     const [dayOptions, setDayOptions] = React.useState([]);
@@ -95,7 +82,6 @@ export function BookAViewing({vacancyId}) {
 
     //property has been changed
     React.useEffect(() => {
-        resetField('suites');
         const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
         const {vacancies} = selectedProperty || [];
         setSuiteOptions(vacancies);
@@ -192,7 +178,7 @@ export function BookAViewing({vacancyId}) {
                     start: moment(t.start).format('h:mm A'),
                     end: moment(t.end).format('h:mm A'),
                     key: index,
-                    value: `${t.start}-${t.end}`,
+                    value: `${moment(t.start).format('YYYY-MM-DDTHH:mm:ss')}to${moment(t.end).format('YYYY-MM-DDTHH:mm:ss')}`,
                 }
             })
             setTimeOptions(timeSlotOptions)
@@ -229,7 +215,7 @@ export function BookAViewing({vacancyId}) {
                         {
                             suiteOptions.map(s => (
                                 <label className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : 'hover:border-hbBlue'} relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
-                                    <input type="checkbox" name="suites" value={s.vacancyId} className={"sr-only"} {...register('suites', {required: true})} disabled={suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? true: false} />
+                                    <input type="checkbox" name="suites" value={s.vacancyId} className={"sr-only"} {...register('suites', {required: 'Please select atleast one suite'})} disabled={suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? true: false} />
                                     <span className={"flex-1 flex"}>
                                         <span className={"flex flex-col"}>
                                             <CheckCircleIcon className={`${suiteWatchCleaned.includes(s.vacancyId) ? 'h-7 w-7 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2' : 'hidden'}`} />
@@ -263,17 +249,21 @@ export function BookAViewing({vacancyId}) {
                         Choose the day you would like to book on. <br />
                         <span className={"text-xs"}>(Please note, we only allow booking up to 4 days in advance)</span>
                     </p>
-                    <div className={"mt-4 gap-x-2 grid grid-cols-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 md:grid-cols-6"}>
+                    <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-4"}>
                         {
                             dayOptions.map(day => {
                                 return day.availableSlots ?
                                     <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${day.value === dayWatch ? 'border border-hbBlue' : ''}`} key={day.value}>
-                                        <input type="radio" name="date" value={day.value} className={"sr-only"} {...register('date', {required: true})} />
+                                        <input type="radio" name="date" value={day.value} className={"sr-only"} {...register('date', {required: 'Please select a viewing day.'})} />
                                         <span className={"flex-1 flex"}>
+                                            <div className={"flex w-3/4"}>
                                                 <span className={"flex flex-col"}>
-                                                    <CheckCircleIcon className={`${day.value === dayWatch ? 'h-6 w-6 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2 ' : 'hidden'}`} />
                                                     <span className={"block text-sm font-medium text-gray-900"}>{day.label}</span>
                                                     <span className={"block text-sm font-medium"}>Available Slots: <span className={"text-green-600"}>{day.availableSlots}</span></span>
+                                                </span>
+                                            </div>
+                                                <span className={"flex items-center w-1/4 justify-end"}>
+                                                    <CheckCircleIcon className={`${day.value === dayWatch ? 'h-6 w-6 text-green-600' : 'hidden'}`} />
                                                 </span>
                                             </span>
                                     </label>
@@ -283,7 +273,6 @@ export function BookAViewing({vacancyId}) {
                                         <input type="radio" name="date" value={day.value} className={"sr-only"} {...register('date', {required: true})} disabled />
                                         <span className={"flex-1 flex"}>
                                                 <span className={"flex flex-col"}>
-                                                    <CheckCircleIcon className={`${day.value === dayWatch ? 'h-6 w-6 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2 ' : 'hidden'}`} />
                                                     <span className={"block text-sm font-medium text-gray-900"}>{day.label}</span>
                                                     <span className={"block text-sm font-medium"}>Available Slots: <span className={"text-red-600"}>{day.availableSlots}</span></span>
                                                 </span>
@@ -305,21 +294,23 @@ export function BookAViewing({vacancyId}) {
         }
 
         return (
-            <div className={"col-span-2"}>
+            <div className={`col-span-2`}>
                 <fieldset>
                     <p>
                         Choose an available timeslot.
                     </p>
-                    <div className={"mt-4 gap-x-2 grid grid-cols-4 gap-y-4"}>
+                    <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4"}>
                         {
                             timeOptions.map(t => (
-                                <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${timeWatch === t.value ? 'border-hbBlue' :''}`} key={t.key}>
-                                    <input type="radio" name="timeslot" className={"sr-only"} {...register('timeslot', {required: true})} value={t.value} />
+                                <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${timeWatch === t.value ? 'border border-hbBlue' :''}`} key={t.key}>
+                                    <input type="radio" name="timeslot" className={"sr-only"} {...register('timeslot', {required: 'Please select a viewing time.'})} value={t.value} />
                                     <span className={"flex-1 flex"}>
-                                    <span className={"flex flex-col"}>
-                                        <CheckCircleIcon className={`${timeWatch === t.value ? 'h-6 w-6 absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600' : 'hidden'}`} />
-                                        <span className={"block text-sm font-medium text-gray-900"}>{t.start} - {t.end}</span>
-                                    </span>
+                                        <span className={"flex flex-none w-3/4 justify-center"}>
+                                            <span className={"block text-sm font-medium text-gray-900"}>{t.start} - {t.end}</span>
+                                        </span>
+                                        <span className={"flex items-center w-1/4 flex-none justify-center"}>
+                                            <CheckCircleIcon className={`${timeWatch === t.value ? 'h-6 w-6 text-green-600' : 'hidden'}`} />
+                                        </span>
                                 </span>
                                 </label>
                             ))
@@ -330,9 +321,69 @@ export function BookAViewing({vacancyId}) {
         )
     }
 
+    //errors
+    function FormErrors() {
+
+        if (!errors || Object.keys(errors).length === 0) {
+            return '';
+        }
+
+        return (
+            <div className={"ring ring-1 ring-red-500 rounded-md p-5 my-5 flex flex-1"}>
+                {
+                    Object.keys(errors).map(key => (
+                        <div className={"flex"} key={key}>
+                            <div className={"flex justify-start items-center"}>
+                                <XCircleIcon className={"text-red-600 h-10 w-10"} />
+                            </div>
+                            <div className={"flex text-red-600 items-center ml-2"}>
+                                {errors[key].message}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        )
+
+    }
+
     //form submission
     const onSubmit = (data) => {
-        console.log(data);
+
+        //making sure property is not 'Please Select...'
+        const {property, suites, timeslot} = data;
+        if (property === 'Please Select...') {
+            setError('property',{message: 'Please select a property.'});
+            return;
+        }
+
+        const vacancyIds = Array.isArray(suites) ? suites : [parseInt(suites)];
+        const vacancies = [];
+        vacancyFeed.filter(p=>p.hasVacancy).map(p => {
+            for (const v of p.vacancies) {
+                if (vacancyIds.includes(v.vacancyId)) {
+                    console.log('matched');
+                    vacancies.push(v);
+                }
+            }
+        })
+
+        //constructing the state data.
+        const stateData = {
+            property: Number(property),
+            suites: vacancies,
+            startDate: timeslot.split('to')[0],
+            endDate: timeslot.split('to')[1]
+        }
+        if (stateData && typeof stateData === 'function') {
+            stateSetter(stateData);
+        }
+        else {
+            console.log('Unable to set state.  stateSetter is not a function.');
+            console.log('state data:');
+            console.log(stateData);
+        }
+
     }
 
     //tailwind classes for the text boxes.
@@ -354,7 +405,7 @@ export function BookAViewing({vacancyId}) {
                 {/*Step 1 - Select a Property*/}
                 <div className={"col-span-2"}>
                     <label htmlFor={"property"} className={"block text-sm font-medium text-hbGray mb-3"}>Select a Property <br/> <span className={"text-xs"}>(Only properties with vacancies are displayed)</span> </label>
-                    <select className={textInputClasses} {...register('property', {required: true})} defaultValue={"Please Select..."}>
+                    <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
                         <option value={"Please Select..."} disabled>Please Select...</option>
                         {
                             propertyOptions.map(p => (
@@ -372,6 +423,8 @@ export function BookAViewing({vacancyId}) {
 
                 {/*Step 4 - Choose a time slot*/}
                 <AvailableTimeSlots control={control} />
+
+                <FormErrors control={control} />
 
                 <div className={"col-span-2 flex justify-end"}>
                     <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
