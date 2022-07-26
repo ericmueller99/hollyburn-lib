@@ -6,7 +6,8 @@ import {Footer} from "./components/footer";
 import {Fonts} from "./components/fonts";
 import {BasicForm} from "./components/basic-form";
 import {BookAViewing} from "./components/book-a-viewing";
+import {LoadingWidget} from "./components/utils";
 
 export {
-    QualifyForm, Header, ThankYou, Footer, Fonts, BasicForm, BookAViewing
+    QualifyForm, Header, ThankYou, Footer, Fonts, BasicForm, BookAViewing, LoadingWidget
 }
