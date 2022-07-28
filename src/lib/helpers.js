@@ -11,3 +11,19 @@ export const formatDate = (date) => {
     }
     return [year, month, day].join('-');
 }
+
+export const txtInputTailwindClasses = () => {
+    return 'py-3 px-4 block w-full shadow-sm border border-gray-300 rounded-md focus:ring-hbBlue outline-hbBlue';
+}
+
+export const formTailwindClasses = () => {
+    return 'mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8';
+}
+
+export const labelTailwindClasses = () => {
+    return 'block text-sm font-medium text-hbGray';
+}
+
+export const checkboxTailwindClasses = () => {
+    return 'focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded outline-hbBlue';
+}

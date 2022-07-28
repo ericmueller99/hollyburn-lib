@@ -1,18 +1,22 @@
 import React  from 'react';
 import {useForm} from 'react-hook-form';
-import {CheckCircleIcon, XCircleIcon} from "@heroicons/react/solid";
+import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import moment from "moment";
 import {formatDate} from "../lib/helpers";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
-    const {buttonText = 'Submit', showBack, handleBackButton} = options;
+    const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {}, showUpdatePrefsBanner, handleUpdatePrefs} = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(false);
-    const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm()
+    const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm({
+        defaultValues: {
+            vacancyDisplayType: 'yes'
+        }
+    })
     const [suiteOptions, setSuiteOptions] = React.useState([]);
     const suiteWatch = watch('suites');
     const [dayOptions, setDayOptions] = React.useState([]);
@@ -20,6 +24,8 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     const propertyWatch = watch('property');
     const [timeOptions, setTimeOptions] = React.useState([]);
     const timeWatch = watch('timeslot');
+    const [preferences, setPreferences] = React.useState(formPrefs)
+    const vacancyDisplayTypeWatch = watch('vacancyDisplayType');
 
     //get the vacancy feed.  this contains properties and all vacant units that we can use to populate the form.
     React.useEffect(() => {
@@ -46,13 +52,58 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     //the vacancy feed data has been refreshed.
     React.useEffect(() => {
-        const properties = vacancyFeed.filter(p => p.hasVacancy).map(p => {
-            return {
-                label: p.propertyName,
-                value: p.propertyHMY
-            }
-        });
-        setPropertyOptions(properties);
+
+        //if there are preferences and the vacancyDisplayWatch === 'yes' then applying those preferences
+        if (preferences && vacancyDisplayTypeWatch === 'yes') {
+            const properties = vacancyFeed.filter(p => {
+                if (!p.hasVacancy) {
+                    return false;
+                }
+                if (preferences.cities && preferences.cities.length > 0) {
+                    if (!preferences.cities.includes(p.city)) {
+                        return false
+                    }
+                }
+                if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
+                    if (!preferences.neighbourhoods.includes(p.neighbourhood)) {
+                        return false;
+                    }
+                }
+                const matchedVacancies = p.vacancies.filter(v => {
+                    if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
+                        if (!preferences.suiteTypes.includes(parseInt(v.bedrooms))) {
+                            return false;
+                        }
+                    }
+                    if (preferences.maxBudget) {
+                        if (parseInt(preferences.maxBudget) < parseInt(v.askingRent)) {
+                            return false
+                        }
+                    }
+                    return true;
+                })
+                if (!matchedVacancies || matchedVacancies.length === 0) {
+                    return false;
+                }
+                return true;
+            }).map(p => {
+                return {
+                    label: p.propertyName,
+                    value: p.propertyHMY
+                }
+            });
+            setPropertyOptions(properties);
+        }
+        else {
+            const properties = vacancyFeed.filter(p => p.hasVacancy).map(p => {
+                return {
+                    label: p.propertyName,
+                    value: p.propertyHMY
+                }
+            });
+            setPropertyOptions(properties);
+        }
+
         if (vacancyId) {
             try {
                 if (Number(vacancyId)) {
@@ -79,16 +130,46 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 console.log(e);
             }
         }
-    }, [vacancyFeed])
+
+        setValue('property', 'Please Select...');
+        resetField('suites');
+        resetField('date');
+        resetField('timeslot');
+
+    }, [vacancyFeed, vacancyDisplayTypeWatch])
 
     //property has been changed
     React.useEffect(() => {
         const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
         const {vacancies} = selectedProperty || [];
-        setSuiteOptions(vacancies);
+
+        //if there are preferences then apply them
+        if (preferences && vacancyDisplayTypeWatch === 'yes' && vacancies && vacancies.length > 0) {
+            console.log(vacancies);
+            const filteredVacancies = vacancies.filter(v => {
+                if (preferences.maxBudget) {
+                    if (parseInt(v.askingRent) > parseInt(preferences.maxBudget)) {
+                        return false;
+                    }
+                }
+                if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
+                    if (!preferences.suiteTypes.includes(parseInt(v.bedrooms))) {
+                        return false;
+                    }
+                }
+                return true;
+            })
+            setSuiteOptions(filteredVacancies);
+        }
+        else {
+            setSuiteOptions(vacancies);
+        }
+
+        //resetting fields
         resetField('suites');
         resetField('date');
         resetField('timeslot');
+
     }, [propertyWatch])
 
     //day options.
@@ -404,9 +485,54 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
             <form className={"mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"} onSubmit={handleSubmit(onSubmit)}>
 
+                {/*Display type.  Filtered on preferences or shows all vacancies*/}
+                <div className={"col-span-2 sm:col-span-1"}>
+                    <fieldset>
+                        <label htmlFor={"vacancy-display-type"} className={"block text-sm font-medium text-hbGray mb-3"}>Filter based on preferences?</label>
+                    </fieldset>
+                    <div className={"relative inline-flex items-start pr-4"}>
+                        <div className={"flex items-center h-5"}>
+                            <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                                   value={'yes'} {...register("vacancyDisplayType")} />
+                        </div>
+                        <div className={"ml-3 text-sm"}>
+                            <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>Yes</label>
+                        </div>
+                    </div>
+                    <div className={"relative inline-flex items-start pr-4"}>
+                        <div className={"flex items-center h-5"}>
+                            <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                                   value={'no'} {...register("vacancyDisplayType")} />
+                        </div>
+                        <div className={"ml-3 text-sm"}>
+                            <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>No</label>
+                        </div>
+                    </div>
+                </div>
+
+                {/*update preferences banner*/}
+                {showUpdatePrefsBanner && vacancyDisplayTypeWatch === 'yes' && handleUpdatePrefs && typeof handleUpdatePrefs === 'function' &&
+                    <div className={"col-span-2"}>
+                        <div className="rounded-md bg-white p-4">
+                            <div className={"flex"}>
+                                <div className="flex-shrink-0 items-center flex">
+                                    <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
+                                </div>
+                                <div className="flex-1 md:flex md:justify-between">
+                                    <p className="flex items-center ml-1">Not seeing what you need?</p>
+                                    <p className="flex items-center">
+                                        <button type="button" className={"w-full inline-flex items-center justify-center px-6 py-1 border border-transparent rounded-md shadow-sm text-base " +
+                                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>Update Preferences</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 {/*Step 1 - Select a Property*/}
                 <div className={"col-span-2"}>
-                    <label htmlFor={"property"} className={"block text-sm font-medium text-hbGray mb-3"}>Select a Property <br/> <span className={"text-xs"}>(Only properties with vacancies are displayed)</span> </label>
+                    <label htmlFor={"property"} className={"block text-sm font-medium text-hbGray mb-3"}>Select a Property <br/> <span className={"text-xs"}>{vacancyDisplayTypeWatch === 'yes' ? '(Vacancies are filtered by your preferences)' : '(Only properties with vacancies are displayed)'}</span> </label>
                     <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
                         <option value={"Please Select..."} disabled>Please Select...</option>
                         {

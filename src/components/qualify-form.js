@@ -6,6 +6,12 @@ import {useForm, Controller, useWatch} from 'react-hook-form';
 import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
+import {
+    checkboxTailwindClasses,
+    formTailwindClasses,
+    labelTailwindClasses,
+    txtInputTailwindClasses
+} from "../lib/helpers";
 
 export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
 
@@ -46,6 +52,10 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     ];
 
     const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton} = options;
+    const formClasses = formTailwindClasses();
+    const textInputClasses = txtInputTailwindClasses();
+    const labelClasses = labelTailwindClasses()
+    const checkboxClasses = checkboxTailwindClasses();
 
     function NeighbourhoodOptions({control}) {
 
@@ -66,17 +76,17 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             return (
                 <>
                     <div className={"col-span-2 sm:col-auto"}>
-                        <label className={"font-medium text-sm"}>*Interested Neighbourhoods</label>
+                        <label className={labelClasses}>*Interested Neighbourhoods</label>
                     </div>
                     <div className={"col-span-2"}>
                         {neighbourhoods.map(n => (
                             <div className={"relative inline-flex items-start pr-4"} key={n.fieldName}>
                                 <div className={"flex items-center h-5"}>
-                                    <input id={n.fieldName} type={"checkbox"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                                    <input id={n.fieldName} type={"checkbox"} className={checkboxClasses}
                                            value={n.value} {...register("neighbourhoods", {required: true})} />
                                 </div>
                                 <div className={"ml-3 text-sm"}>
-                                    <label htmlFor={n.fieldName} className={"font-medium text-gray-700"}>{n.name}</label>
+                                    <label htmlFor={n.fieldName} className={labelClasses}>{n.name}</label>
                                 </div>
                             </div>
                         ))}
@@ -146,9 +156,6 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             })
     }
 
-    //tailwind css classes for the form fields.
-    const textInputClasses = 'py-3 px-4 block w-full shadow-sm text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md';
-
     return (
         <div className={"py-10 px-6 sm:px-10 lg:col-span-2 xl:p-12"}>
             {/*loading widget*/}
@@ -163,46 +170,46 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             {/*form header*/}
             <h3 className={"text-lg font-medium text-gray-900 font-bold"}>Personal Information</h3>
             {/*form*/}
-            <form className={"mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"} onSubmit={handleSubmit(onSubmit)}>
+            <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
 
                 {/*First Name*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"firstName"} className={"block text-sm font-medium text-gray-900"}>*First Name</label>
+                    <label htmlFor={"firstName"} className={labelClasses}>*First Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('firstName', {required: true, maxLength: 50})}
-                               className={textInputClasses} />
+                               className={textInputClasses} title="First Name" />
                         {errors.firstName && <p className={"text-red-600"}>First name is required.</p>}
                     </div>
                 </div>
 
                 {/*Last Name*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"lastName"} className={"block text-sm font-medium text-gray-900"}>*Last Name</label>
+                    <label htmlFor={"lastName"} className={labelClasses}>*Last Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('lastName', {required: true, maxLength: 50})}
-                               className={textInputClasses} />
+                               className={textInputClasses} title="Last Name" />
                         {errors.lastName && <p className={"text-red-600"}>Last name is required.</p>}
                     </div>
                 </div>
 
                 {/*Email Address*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"email"} className={"block text-sm font-medium text-gray-900"}>
+                    <label htmlFor={"email"} className={labelClasses}>
                         *Email Address
                     </label>
                     <div className={"mt-1"}>
-                        <input type={"email"} {...register("emailAddress", {pattern: /\S+@\S+\.\S+/, required: true})} className={textInputClasses} />
+                        <input type={"email"} {...register("emailAddress", {pattern: /\S+@\S+\.\S+/, required: true})} className={textInputClasses} title="Email Address" />
                         {errors.emailAddress && <p className={"text-red-600"}>Email address is not valid.</p>}
                     </div>
                 </div>
 
                 {/*Phone Number*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"phone"} className={"block text-sm font-medium text-gray-900"}>
+                    <label htmlFor={"phone"} className={labelClasses}>
                         *Phone Number
                     </label>
                     <div className={"mt-1"}>
-                        <input type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} />
+                        <input type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} title="Phone Number" />
                         {errors.phoneNumber && <p className={'text-red-600'}>Valid phone number is required.</p>}
                     </div>
                 </div>
@@ -211,45 +218,44 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*Suite Types*/}
                 <div className={"col-span-2"}>
-                    <label className={"font-medium text-sm"}>*Suite Types</label>
+                    <label className={labelClasses}>*Suite Types</label>
                 </div>
                 <div className={"col-span-2"}>
                     {suiteTypeOptions.map(e => (
                         <div className="relative inline-flex items-start pr-4" key={e.name}>
                             <div className="flex items-center h-5">
                                 <input id={e.fieldName} name={'suiteTypes'} type="checkbox"
-                                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                       value={e.value} {...register("suiteTypes", {required: true})}
+                                       className={checkboxClasses}
+                                       value={e.value} {...register("suiteTypes", {required: true})} title="Suite Type"
                                 />
                             </div>
                             <div className="ml-3 text-sm">
-                                <label htmlFor={e.fieldName} className="font-medium text-gray-700">
+                                <label htmlFor={e.fieldName} className={labelClasses}>
                                     {e.name}
                                 </label>
                             </div>
                         </div>
                     ))}
-                    {errors.suiteTypes && <p className={"text-red-600"}>Please select atleast one suite type</p>}
+                    {errors.suiteTypes && <p className={"text-red-600"}>Please select at minimum one suite type.</p>}
                 </div>
 
                 {/* max budget*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"max-budget"} className={"block text-sm font-medium text-gray-900"}>*Maximum Budget</label>
-                    <div className={"mt-1"}>
-                        <input type={"number"} className={textInputClasses} {...register('maxBudget', {required: true, max: 9999, min: 500})} />
+                    <label htmlFor={"max-budget"} className={labelClasses}>*Maximum Budget</label>
+                    <div className={"mt-2"}>
+                        <input type={"number"} className={textInputClasses} {...register('maxBudget', {required: true, max: 9999, min: 500})} title="Maximum Budget" />
                         {errors.maxBudget && <p className={"text-red-600"}>Max budget must be between 500 and 9999</p>}
                     </div>
                 </div>
 
                 {/*move-in date*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"move-in"} className={"font-medium text-sm"}>
+                    <label htmlFor={"move-in"} className={labelClasses}>
                         *Desired Move-in Date
                     </label>
                     <div className={"mt-1 datepicker"}>
                         <Controller render={({ field }) => (
-                            <DatePicker selected={field.value} onChange={(date) => field.onChange( date )} dateFormat={"yyyy-MM-dd"} className={textInputClasses} placeholderText={"Select Date"}
-                            />
+                            <DatePicker selected={field.value} onChange={(date) => field.onChange( date )} dateFormat={"yyyy-MM-dd"} className={textInputClasses} />
                         )} name="moveIn" control={control} rules={{required: true}} />
                         {errors.moveIn && <p className={"text-red-600"}> {errors.moveIn.message ? errors.moveIn.message : 'Move-in is required.'}  </p>}
                     </div>
@@ -257,19 +263,19 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*Pet friendly*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label className={"font-medium text-sm"}>
+                    <label className={labelClasses}>
                         Pet Friendly Required?
                     </label>
                     <div className={"mt-4"}>
                         <div className="relative inline-flex items-start pr-4">
                             <div className="flex items-center h-5">
-                                <input id={"pet-friendly"} name={'pet-friendly'} type="checkbox"
+                                <input id={"pet-friendly"} name={'pet-friendly'} type="checkbox" title="Pet Friendly"
                                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
                                        {...register("petFriendly")}
                                 />
                             </div>
                             <div className="ml-3 text-sm">
-                                <label htmlFor={"pet-friendly"} className="font-medium text-gray-700">
+                                <label htmlFor={"pet-friendly"} className={labelClasses}>
                                     Yes
                                 </label>
                             </div>
@@ -279,9 +285,9 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*Number of Occupants*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label htmlFor={"occupants"} className={"text-sm font-medium"}>Number Of Occupants</label>
+                    <label htmlFor={"occupants"} className={labelClasses}>Number Of Occupants</label>
                     <div>
-                        <select id={"occupants"} name={"occupants"} className={textInputClasses} {...register('numberOfOccupants', {required: true})}>
+                        <select id={"occupants"} name={"occupants"} className={textInputClasses} {...register('numberOfOccupants', {required: true})} title="Number of Occupants">
                             {occupantOptions.map(e => (
                                 <option key={e.value} value={e.value}>{e.label}</option>
                             ))}
@@ -292,21 +298,21 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*City Interest*/}
                 <div className={"col-span-2 sm:col-auto"}>
-                    <label className={"font-medium text-sm"}>Interested Cities</label>
+                    <label className={labelClasses}>Interested Cities</label>
                 </div>
                 <div className={"col-span-2"}>
                     {cityOptions.map(city => (
                         <div className={"relative inline-flex items-start pr-4"} key={city.fieldName}>
                             <div className={"flex items-center h-5"}>
-                                <input id={city.fieldName} type={"checkbox"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                                <input id={city.fieldName} type={"checkbox"} className={checkboxClasses}
                                        value={city.value} {...register("cities", {required: true})} />
                             </div>
                             <div className={"ml-3 text-sm"}>
-                                <label htmlFor={city.fieldName} className={"font-medium text-gray-700"}>{city.name}</label>
+                                <label htmlFor={city.fieldName} className={labelClasses}>{city.name}</label>
                             </div>
                         </div>
                     ))}
-                    {errors.cities && <p className={"text-red-600"}>Please select atleast one city</p> }
+                    {errors.cities && <p className={"text-red-600"}>Please select at minimum one city</p> }
                 </div>
 
                 {/*Neighbourhoods*/}

@@ -49,3 +49,14 @@ const Template = (args) => {
 }
 export const Standard = Template.bind({});
 Standard.args = {};
+
+export const Wizard = Template.bind({});
+Wizard.args = {
+    options: {
+        buttonText: 'Next',
+        showBack: true,
+        handleBackButton: () => {
+            console.log('going back!');
+        }
+    }
+}
