@@ -7,7 +7,7 @@ import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
 
-export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
+export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
 
     //TODO update these to pull from Salesforce
     const occupantOptions = [
@@ -45,7 +45,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {name: 'Yorkville', value: 'Yorkville', fieldName: 'yorkville', inCity: 'Toronto'},
     ];
 
-    const {buttonText = 'Submit', submitUrl = '/api/submit'} = options;
+    const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton} = options;
 
     function NeighbourhoodOptions({control}) {
 
@@ -92,7 +92,11 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     }
 
-    const {control, register, handleSubmit, formState: {errors}, setError} = useForm();
+    const {control, register, handleSubmit, formState: {errors}, setError, setValue} = useForm({
+        defaultValues: {
+            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants
+        }
+    });
     const [isLoading, setIsLoading] = React.useState(false);
     const [hasCriticalError, setHasCriticalError] = React.useState(false)
     const [criticalErrorMessage, setCriticalErrorMessage] = React.useState('');
@@ -126,9 +130,14 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             .then(res => {
                 console.log(res);
                 setIsLoading(false);
-                const {id} = res;
+                const {id} = res.data?.data;
                 data = {...data, formSubmissionId: id, result: true};
-                stateSetter(data);
+                if (stateSetter && typeof stateSetter === "function") {
+                    stateSetter(data);
+                }
+                else {
+                    console.log('unable to update state.  stateSetter is not a function');
+                }
             })
             .catch(error => {
                 setHasCriticalError(true);
@@ -161,7 +170,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                     <label htmlFor={"firstName"} className={"block text-sm font-medium text-gray-900"}>*First Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('firstName', {required: true, maxLength: 50})}
-                               className={textInputClasses} value={firstName} />
+                               className={textInputClasses} />
                         {errors.firstName && <p className={"text-red-600"}>First name is required.</p>}
                     </div>
                 </div>
@@ -171,7 +180,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                     <label htmlFor={"lastName"} className={"block text-sm font-medium text-gray-900"}>*Last Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('lastName', {required: true, maxLength: 50})}
-                               className={textInputClasses} value={lastName} />
+                               className={textInputClasses} />
                         {errors.lastName && <p className={"text-red-600"}>Last name is required.</p>}
                     </div>
                 </div>
@@ -182,7 +191,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                         *Email Address
                     </label>
                     <div className={"mt-1"}>
-                        <input type={"email"} value={emailAddress} {...register("emailAddress", {pattern: /\S+@\S+\.\S+/, required: true})} className={textInputClasses} />
+                        <input type={"email"} {...register("emailAddress", {pattern: /\S+@\S+\.\S+/, required: true})} className={textInputClasses} />
                         {errors.emailAddress && <p className={"text-red-600"}>Email address is not valid.</p>}
                     </div>
                 </div>
@@ -193,7 +202,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                         *Phone Number
                     </label>
                     <div className={"mt-1"}>
-                        <input value={phoneNumber} type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} />
+                        <input type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} />
                         {errors.phoneNumber && <p className={'text-red-600'}>Valid phone number is required.</p>}
                     </div>
                 </div>
@@ -227,7 +236,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 <div className={"col-span-2 sm:col-auto"}>
                     <label htmlFor={"max-budget"} className={"block text-sm font-medium text-gray-900"}>*Maximum Budget</label>
                     <div className={"mt-1"}>
-                        <input value={maxBudget} type={"number"} className={textInputClasses} {...register('maxBudget', {required: true, max: 9999, min: 500})} />
+                        <input type={"number"} className={textInputClasses} {...register('maxBudget', {required: true, max: 9999, min: 500})} />
                         {errors.maxBudget && <p className={"text-red-600"}>Max budget must be between 500 and 9999</p>}
                     </div>
                 </div>
@@ -239,7 +248,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                     </label>
                     <div className={"mt-1 datepicker"}>
                         <Controller render={({ field }) => (
-                            <DatePicker value={moveIn} selected={field.value} onChange={(date) => field.onChange( date )} dateFormat={"yyyy-MM-dd"} className={textInputClasses} placeholderText={"Select Date"}
+                            <DatePicker selected={field.value} onChange={(date) => field.onChange( date )} dateFormat={"yyyy-MM-dd"} className={textInputClasses} placeholderText={"Select Date"}
                             />
                         )} name="moveIn" control={control} rules={{required: true}} />
                         {errors.moveIn && <p className={"text-red-600"}> {errors.moveIn.message ? errors.moveIn.message : 'Move-in is required.'}  </p>}
@@ -256,7 +265,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                             <div className="flex items-center h-5">
                                 <input id={"pet-friendly"} name={'pet-friendly'} type="checkbox"
                                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                       value={'Yes'} {...register("petFriendly")}
+                                       {...register("petFriendly")}
                                 />
                             </div>
                             <div className="ml-3 text-sm">
@@ -272,7 +281,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 <div className={"col-span-2 sm:col-auto"}>
                     <label htmlFor={"occupants"} className={"text-sm font-medium"}>Number Of Occupants</label>
                     <div>
-                        <select id={"occupants"} name={"occupants"} defaultValue={numberOfOccupants} className={textInputClasses} {...register('numberOfOccupants', {required: true})}>
+                        <select id={"occupants"} name={"occupants"} className={textInputClasses} {...register('numberOfOccupants', {required: true})}>
                             {occupantOptions.map(e => (
                                 <option key={e.value} value={e.value}>{e.label}</option>
                             ))}
@@ -321,9 +330,15 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 }
 
-
                 {/*Submit button*/}
                 <div className={"sm:col-span-2 sm:flex sm:justify-end"}>
+
+                    {showBack && handleBackButton &&
+                        <button type="button" className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
+                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto mr-4"} onClick={event => handleBackButton(event)} >Back</button>
+
+                    }
+
                     <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
                         "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
                         {buttonText}

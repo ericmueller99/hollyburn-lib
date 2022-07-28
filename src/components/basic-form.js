@@ -2,7 +2,7 @@ import React from 'react';
 import {useForm} from 'react-hook-form';
 import Image from "next/image";
 
-export function BasicForm({stateSetter, firstName = '', lastName = '', emailAddress = '', phoneNumber = '', options = {}}) {
+export function BasicForm({stateSetter, firstName, lastName, emailAddress, phoneNumber, options = {}}) {
 
     //options
     const {buttonText = 'Submit'} = options;

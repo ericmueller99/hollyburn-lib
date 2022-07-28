@@ -7,7 +7,7 @@ import {formatDate} from "../lib/helpers";
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
-    const {buttonText = 'Submit'} = options;
+    const {buttonText = 'Submit', showBack, handleBackButton} = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
@@ -300,7 +300,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     <p>
                         Choose an available timeslot.
                     </p>
-                    <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4"}>
+                    <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4"}>
                         {
                             timeOptions.map(t => (
                                 <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${timeWatch === t.value ? 'border border-hbBlue' :''}`} key={t.key}>
@@ -377,7 +377,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             startDate: timeslot.split('to')[0],
             endDate: timeslot.split('to')[1]
         }
-        if (stateData && typeof stateData === 'function') {
+        if (stateSetter && typeof stateSetter === 'function') {
             stateSetter(stateData);
         }
         else {
@@ -429,6 +429,13 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 <FormErrors control={control} />
 
                 <div className={"col-span-2 flex justify-end"}>
+
+                    {showBack && handleBackButton &&
+                        <button type="button" className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
+                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto mr-4"} onClick={event => handleBackButton(event)} >Back</button>
+
+                    }
+
                     <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
                         "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
                         {buttonText}

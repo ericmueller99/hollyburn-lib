@@ -5,12 +5,6 @@ export default {
     title: 'Qualify Form',
     component: QualifyForm,
     argTypes: {
-        maxBudget: {
-            control: {type: 'number', min: 0, max: 9999}
-        },
-        firstName: {
-            control: {type: 'text'}
-        },
         lastName: {
             control: {type: 'text'}
         },
@@ -22,9 +16,27 @@ export default {
         phoneNumber: {
             control: {type: 'text'}
         },
-        submitUrl: {
+        maxBudget: {
+            control: {type: 'number', min: 0, max: 9999}
+        },
+        firstName: {
             control: {type: 'text'}
+        },
+        suiteTypes: {
+            control: 'inline-check', options: ['0','1','2','3']
+        },
+        cities: {
+            control: 'inline-check', options: ['Ottawa', 'Vancouver', 'Calgary', 'West Vancouver', 'North Vancouver', 'Toronto']
+        },
+        neighbourhoods: {
+            control: 'inline-check', options: ['West End', 'South Granville', 'Kitsilano', 'UBC Point Grey', 'Oakridge', 'Marpole', 'Downtown Toronto', 'The Annex', 'Etobicoke', 'Yorkville']
+        },
+        options: {
+            control: 'object'
         }
+    },
+    parameters: {
+        controls: {sort: 'alpha'}
     }
 }
 
