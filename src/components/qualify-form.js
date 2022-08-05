@@ -7,9 +7,10 @@ import moment from 'moment';
 import axios from "axios";
 import {XCircleIcon} from "@heroicons/react/solid";
 import {
-    checkboxTailwindClasses,
+    buttonTailwindClasses,
+    checkboxTailwindClasses, formHolderTailwindClasses,
     formTailwindClasses,
-    labelTailwindClasses,
+    labelTailwindClasses, txtInputHolderTailwindClasses,
     txtInputTailwindClasses
 } from "../lib/helpers";
 
@@ -51,11 +52,12 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {name: 'Yorkville', value: 'Yorkville', fieldName: 'yorkville', inCity: 'Toronto'},
     ];
 
-    const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton} = options;
-    const formClasses = formTailwindClasses();
-    const textInputClasses = txtInputTailwindClasses();
-    const labelClasses = labelTailwindClasses()
-    const checkboxClasses = checkboxTailwindClasses();
+    const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton,
+        formClasses = formTailwindClasses(), textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(),
+        formHolderClasses = formHolderTailwindClasses(), textInputHolderClasses = txtInputHolderTailwindClasses(), checkboxClasses = checkboxTailwindClasses(),
+        buttonClasses = buttonTailwindClasses()
+
+    } = options;
 
     function NeighbourhoodOptions({control}) {
 
@@ -157,7 +159,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     }
 
     return (
-        <div className={"py-10 px-6 sm:px-10 lg:col-span-2 xl:p-12"}>
+        <div className={formHolderClasses}>
             {/*loading widget*/}
             <div className={isLoading ? 'block' : 'hidden'}>
                 <div className={"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"} style={{zIndex:500}}>
@@ -173,7 +175,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
 
                 {/*First Name*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"firstName"} className={labelClasses}>*First Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('firstName', {required: true, maxLength: 50})}
@@ -183,7 +185,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*Last Name*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"lastName"} className={labelClasses}>*Last Name</label>
                     <div className={"mt-1"}>
                         <input type={"text"} {...register('lastName', {required: true, maxLength: 50})}
@@ -193,7 +195,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*Email Address*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"email"} className={labelClasses}>
                         *Email Address
                     </label>
@@ -204,7 +206,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*Phone Number*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"phone"} className={labelClasses}>
                         *Phone Number
                     </label>
@@ -240,7 +242,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/* max budget*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"max-budget"} className={labelClasses}>*Maximum Budget</label>
                     <div className={"mt-2"}>
                         <input type={"number"} className={textInputClasses} {...register('maxBudget', {required: true, max: 9999, min: 500})} title="Maximum Budget" />
@@ -249,7 +251,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*move-in date*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"move-in"} className={labelClasses}>
                         *Desired Move-in Date
                     </label>
@@ -262,7 +264,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*Pet friendly*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label className={labelClasses}>
                         Pet Friendly Required?
                     </label>
@@ -284,7 +286,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*Number of Occupants*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={textInputHolderClasses}>
                     <label htmlFor={"occupants"} className={labelClasses}>Number Of Occupants</label>
                     <div>
                         <select id={"occupants"} name={"occupants"} className={textInputClasses} {...register('numberOfOccupants', {required: true})} title="Number of Occupants">
@@ -338,15 +340,11 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*Submit button*/}
                 <div className={"sm:col-span-2 sm:flex sm:justify-end"}>
-
                     {showBack && handleBackButton &&
-                        <button type="button" className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto mr-4"} onClick={event => handleBackButton(event)} >Back</button>
+                        <button type="button" className={buttonClasses} onClick={event => handleBackButton(event)} >Back</button>
 
                     }
-
-                    <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                        "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
+                    <button type={"submit"} className={buttonClasses}>
                         {buttonText}
                     </button>
                 </div>
