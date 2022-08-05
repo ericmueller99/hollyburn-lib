@@ -26,10 +26,10 @@ module.exports = {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", 'postcss-loader'],
             },
-            {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
-                type: 'asset/resource'
-            }
+            // {
+            //     test: /\.(png|svg|jpg|jpeg|gif)$/i,
+            //     type: 'asset/resource'
+            // }
         ],
     },
     plugins: [
@@ -40,6 +40,6 @@ module.exports = {
     ],
     externals: [nodeExternals()],
     resolve: {
-        extensions: ['.js', '.css', '.jsx']
+        extensions: ['.js', '.jsx']
     }
 }

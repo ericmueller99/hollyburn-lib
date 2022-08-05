@@ -341,7 +341,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 {/*Submit button*/}
                 <div className={"sm:col-span-2 sm:flex sm:justify-end"}>
                     {showBack && handleBackButton &&
-                        <button type="button" className={buttonClasses} onClick={event => handleBackButton(event)} >Back</button>
+                        <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
 
                     }
                     <button type={"submit"} className={buttonClasses}>
