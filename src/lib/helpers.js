@@ -27,3 +27,11 @@ export const labelTailwindClasses = () => {
 export const checkboxTailwindClasses = () => {
     return 'focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded outline-hbBlue';
 }
+
+export const formHolderTailwindClasses = () => {
+    return 'py-10 px-6 sm:px-10 lg:col-span-2 xl:p-12';
+}
+
+export const txtInputHolderTailwindClasses = () => {
+    return 'col-span-2 sm:col-auto';
+}
