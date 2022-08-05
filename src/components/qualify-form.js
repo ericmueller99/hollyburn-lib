@@ -59,6 +59,15 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     } = options;
 
+    const {control, register, handleSubmit, formState: {errors}, setError, setValue, getValues} = useForm({
+        defaultValues: {
+            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants
+        }
+    });
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [hasCriticalError, setHasCriticalError] = React.useState(false)
+    const [criticalErrorMessage, setCriticalErrorMessage] = React.useState('');
+
     function NeighbourhoodOptions({control}) {
 
         //subscribing to change events for the cities options
@@ -70,6 +79,15 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
             //which neighbourhoods should be shown ?
             const neighbourhoods = neighbourhoodOptions.filter(n => cities.includes(n.inCity));
+            const selectedNeighbourhoods = getValues('neighbourhoods');
+            if (selectedNeighbourhoods && selectedNeighbourhoods.length > 0) {
+                const validSelectedNeighbourhoods = neighbourhoods.filter(n => {
+                    return !!selectedNeighbourhoods.includes(n.value);
+                }).map(n => n.value);
+                setValue('neighbourhoods', validSelectedNeighbourhoods);
+            }
+
+            // console.log(getValues('neighbourhoods'));
 
             if (neighbourhoods.length === 0) {
                 return '';
@@ -103,15 +121,6 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         return '';
 
     }
-
-    const {control, register, handleSubmit, formState: {errors}, setError, setValue} = useForm({
-        defaultValues: {
-            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants
-        }
-    });
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [hasCriticalError, setHasCriticalError] = React.useState(false)
-    const [criticalErrorMessage, setCriticalErrorMessage] = React.useState('');
 
     //form submission
     const onSubmit = (data) => {

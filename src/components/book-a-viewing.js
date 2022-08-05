@@ -55,6 +55,8 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //the vacancy feed data has been refreshed.
     React.useEffect(() => {
 
+        console.log(vacancyFeed);
+
         //if there are preferences and the vacancyDisplayWatch === 'yes' then applying those preferences
         if (preferences && vacancyDisplayTypeWatch === 'yes') {
             const properties = vacancyFeed.filter(p => {
@@ -67,6 +69,9 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     }
                 }
                 if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
+                    if (p.neighbourhood === p.city) {
+                        return true;
+                    }
                     if (!preferences.neighbourhoods.includes(p.neighbourhood)) {
                         return false;
                     }
@@ -94,6 +99,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     value: p.propertyHMY
                 }
             });
+            console.log(properties);
             setPropertyOptions(properties);
         }
         else {

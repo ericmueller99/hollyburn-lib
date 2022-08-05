@@ -69,3 +69,16 @@ PrefsVancouver3BedWestEnd4500Max.args = {
         }
     }
 }
+
+export const PrefsMultipleCities = Template.bind({})
+PrefsMultipleCities.args = {
+    options: {
+        preferences: {
+            cities: ['West Vancouver', 'North Vancouver', 'Vancouver'],
+            neighbourhoods: ['West End', 'South Granville', 'Kitsilano', 'UBC Point Grey', 'Kerrisdale', 'Oakridge', 'Marpole'],
+            maxBudget: 5000,
+            numberOfOccupants: "2",
+            suiteTypes: ['3']
+        }
+    }
+}
