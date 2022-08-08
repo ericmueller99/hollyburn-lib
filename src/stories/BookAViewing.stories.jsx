@@ -82,3 +82,17 @@ PrefsMultipleCities.args = {
         }
     }
 }
+
+export const PrefsThreeBedroomLowMaxBudget = Template.bind({})
+PrefsThreeBedroomLowMaxBudget.args = {
+    options: {
+        preferences: {
+            suiteTypes: ['3'],
+            maxBudget: 2700
+        },
+        showUpdatePrefsBanner: true,
+        handleUpdatePrefs: () => {
+            console.log('hello')
+        }
+    }
+}
