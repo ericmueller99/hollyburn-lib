@@ -2,12 +2,22 @@ import React  from 'react';
 import {useForm} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import moment from "moment";
-import {formatDate, labelTailwindClasses, txtInputTailwindClasses} from "../lib/helpers";
+import {
+    buttonTailwindClasses,
+    formatDate,
+    formHolderTailwindClasses,
+    formTailwindClasses,
+    labelTailwindClasses,
+    txtInputTailwindClasses
+} from "../lib/helpers";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
-    const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {}, showUpdatePrefsBanner, handleUpdatePrefs} = options;
+    const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
+        showUpdatePrefsBanner, handleUpdatePrefs, formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
+        buttonClasses = buttonTailwindClasses()
+    } = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
@@ -480,7 +490,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     }
 
     return (
-        <div className={"py-10 px-6 sm:px-10 lg:col-span-2 xl:p-12"}>
+        <div className={formHolderClasses}>
 
             {/*Loading Widget*/}
             <div className={isLoading ? 'block' : 'hidden'}>
@@ -490,7 +500,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 </div>
             </div>
 
-            <form className={"mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"} onSubmit={handleSubmit(onSubmit)}>
+            <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
 
                 {/*Display type.  Filtered on preferences or shows all vacancies*/}
                 <div className={"col-span-2 sm:col-span-1"}>
@@ -565,13 +575,10 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
                 <div className={"col-span-2 flex justify-end"}>
                     {showBack && handleBackButton &&
-                        <button type="button" className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto mr-4"} onClick={event => handleBackButton(event)} >Back</button>
+                        <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
 
                     }
-
-                    <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                        "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
+                    <button type={"submit"} className={buttonClasses}>
                         {buttonText}
                     </button>
                 </div>
