@@ -114,7 +114,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         if (vacancyId) {
             try {
-                if (Number(vacancyId)) {
+                if (parseInt(vacancyId)) {
                     //trying to find the vacancy
                     let vacancy;
                     const [property] = vacancyFeed.filter(p => {
