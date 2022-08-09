@@ -146,10 +146,13 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             }
         }
 
-        setValue('property', 'Please Select...');
-        resetField('suites');
-        resetField('date');
-        resetField('timeslot');
+
+        if (!vacancyId) {
+            setValue('property', 'Please Select...');
+            resetField('suites');
+            resetField('date');
+            resetField('timeslot');
+        }
 
     }, [vacancyFeed, vacancyDisplayTypeWatch])
 
