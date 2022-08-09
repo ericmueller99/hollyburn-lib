@@ -2,12 +2,22 @@ import React  from 'react';
 import {useForm} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import moment from "moment";
-import {formatDate, labelTailwindClasses, txtInputTailwindClasses} from "../lib/helpers";
+import {
+    buttonTailwindClasses,
+    formatDate,
+    formHolderTailwindClasses,
+    formTailwindClasses,
+    labelTailwindClasses,
+    txtInputTailwindClasses
+} from "../lib/helpers";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
-    const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {}, showUpdatePrefsBanner, handleUpdatePrefs} = options;
+    const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
+        showUpdatePrefsBanner, handleUpdatePrefs, formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
+        buttonClasses = buttonTailwindClasses()
+    } = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
@@ -55,8 +65,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //the vacancy feed data has been refreshed.
     React.useEffect(() => {
 
-        console.log(vacancyFeed);
-
         //if there are preferences and the vacancyDisplayWatch === 'yes' then applying those preferences
         if (preferences && vacancyDisplayTypeWatch === 'yes') {
             const properties = vacancyFeed.filter(p => {
@@ -99,7 +107,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     value: p.propertyHMY
                 }
             });
-            console.log(properties);
             setPropertyOptions(properties);
         }
         else {
@@ -153,7 +160,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //if there are preferences then apply them
         if (preferences && vacancyDisplayTypeWatch === 'yes' && vacancies && vacancies.length > 0) {
-            console.log(vacancies);
             const filteredVacancies = vacancies.filter(v => {
                 if (preferences.maxBudget) {
                     if (parseInt(v.askingRent) > parseInt(preferences.maxBudget)) {
@@ -480,7 +486,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     }
 
     return (
-        <div className={"py-10 px-6 sm:px-10 lg:col-span-2 xl:p-12"}>
+        <div className={formHolderClasses}>
 
             {/*Loading Widget*/}
             <div className={isLoading ? 'block' : 'hidden'}>
@@ -490,7 +496,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 </div>
             </div>
 
-            <form className={"mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8"} onSubmit={handleSubmit(onSubmit)}>
+            <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
 
                 {/*Display type.  Filtered on preferences or shows all vacancies*/}
                 <div className={"col-span-2 sm:col-span-1"}>
@@ -518,7 +524,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 </div>
 
                 {/*update preferences banner*/}
-                {showUpdatePrefsBanner && vacancyDisplayTypeWatch === 'yes' && handleUpdatePrefs && typeof handleUpdatePrefs === 'function' &&
+                {showUpdatePrefsBanner && vacancyDisplayTypeWatch === 'yes' && handleUpdatePrefs && typeof handleUpdatePrefs === 'function' && propertyOptions.length > 0 &&
                     <div className={"col-span-2"}>
                         <div className="rounded-md bg-white p-4 border border-gray-300">
                             <div className={"flex"}>
@@ -538,19 +544,42 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 }
 
                 {/*Step 1 - Select a Property*/}
-                <div className={"col-span-2"}>
-                    <label htmlFor={"property"} className={labelClasses}>Select a Property <br/> <span className={"text-xs"}>{vacancyDisplayTypeWatch === 'yes' ? '(Vacancies are filtered by your preferences)' : '(Only properties with vacancies are displayed)'}</span> </label>
-                    <div className={"mt-1"}>
-                        <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
-                            <option value={"Please Select..."} disabled>Please Select...</option>
-                            {
-                                propertyOptions.map(p => (
-                                    <option value={p.value} key={p.value}>{p.label}</option>
-                                ))
-                            }
-                        </select>
+                {
+                    propertyOptions && propertyOptions.length > 0 &&
+                    <div className={"col-span-2"}>
+                        <label htmlFor={"property"} className={labelClasses}>Select a Property <br/> <span className={"text-xs"}>{vacancyDisplayTypeWatch === 'yes' ? '(Vacancies are filtered by your preferences)' : '(Only properties with vacancies are displayed)'}</span> </label>
+                        <div className={"mt-1"}>
+                            <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
+                                <option value={"Please Select..."} disabled>Please Select...</option>
+                                {
+                                    propertyOptions.map(p => (
+                                        <option value={p.value} key={p.value}>{p.label}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
                     </div>
-                </div>
+                }
+                {
+                    !propertyOptions || propertyOptions.length === 0 &&
+                    <div className="col-span-2">
+                        <div className="rounded-md bg-white p-4 border border-red-400">
+                            <div className="flex">
+                                <div className="flex-shrink-0 items-center flex">
+                                    <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
+                                </div>
+                                <div className="flex-1 md:flex md:justify-between">
+                                    <p className="flex items-center ml-1">There are currently no vacancies available that match your preferences.</p>
+                                    <p className="flex items-center">
+                                        <button type="button" className={"w-full inline-flex items-center justify-center px-6 py-1 border border-transparent rounded-md shadow-sm text-base " +
+                                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"} onClick={event => handleUpdatePrefs(event)}>Update Preferences</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
 
                 {/*Step 2 - Choose Available Suites*/}
                 <AvailableSuites control={control} />
@@ -565,13 +594,12 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
                 <div className={"col-span-2 flex justify-end"}>
                     {showBack && handleBackButton &&
-                        <button type="button" className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto mr-4"} onClick={event => handleBackButton(event)} >Back</button>
-
+                        <>
+                            <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
+                            &nbsp;
+                        </>
                     }
-
-                    <button type={"submit"} className={"mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                        "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"}>
+                    <button type={"submit"} className={buttonClasses}>
                         {buttonText}
                     </button>
                 </div>
