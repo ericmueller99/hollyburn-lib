@@ -71,21 +71,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 if (!p.hasVacancy) {
                     return false;
                 }
-                if (preferences.cities && preferences.cities.length > 0) {
-                    if (!preferences.cities.includes(p.city)) {
-                        return false
-                    }
-                }
-                if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
-                    if (p.neighbourhood === p.city) {
-                        return true;
-                    }
-                    if (!preferences.neighbourhoods.includes(p.neighbourhood)) {
+                const matchedVacancies = p.vacancies.filter(v => {
+                    if (v.furnishedRental) {
                         return false;
                     }
-                }
-                const matchedVacancies = p.vacancies.filter(v => {
                     if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
+                        if (p.propertyName === 'Hollyburn Gardens') {
+                            console.log(!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms)))
+                        }
                         if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
                             return false;
                         }
@@ -100,6 +93,16 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 if (!matchedVacancies || matchedVacancies.length === 0) {
                     return false;
                 }
+                if (preferences.cities && preferences.cities.length > 0) {
+                    if (!preferences.cities.includes(p.city)) {
+                        return false
+                    }
+                }
+                if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
+                    if (!preferences.neighbourhoods.includes(p.neighbourhood) && p.neighbourhood !== p.city) {
+                        return false;
+                    }
+                }
                 return true;
             }).map(p => {
                 return {
@@ -110,7 +113,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             setPropertyOptions(properties);
         }
         else {
-            const properties = vacancyFeed.filter(p => p.hasVacancy).map(p => {
+            const properties = vacancyFeed.filter(p => {
+                if (!p.hasVacancy) {
+                    return false;
+                }
+                const unfurnishedVacancies = p.vacancies.filter(v => !v.furnishedRental);
+                return unfurnishedVacancies.length !== 0;
+
+            }).map(p => {
                 return {
                     label: p.propertyName,
                     value: p.propertyHMY
@@ -146,7 +156,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             }
         }
 
-
         if (!vacancyId) {
             setValue('property', 'Please Select...');
             resetField('suites');
@@ -158,8 +167,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     //property has been changed
     React.useEffect(() => {
+
         const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
-        const {vacancies} = selectedProperty || [];
+        if (!selectedProperty) {
+            return;
+        }
+
+        let {vacancies} = selectedProperty || [];
+        vacancies = vacancies.filter(v => !v.furnishedRental);
 
         //if there are preferences then apply them
         if (preferences && vacancyDisplayTypeWatch === 'yes' && vacancies && vacancies.length > 0) {

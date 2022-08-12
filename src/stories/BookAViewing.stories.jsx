@@ -99,5 +99,5 @@ PrefsThreeBedroomLowMaxBudget.args = {
 
 export const WithVacancyId = Template.bind({})
 WithVacancyId.args = {
-    vacancyId: '79958'
+    vacancyId: '79984'
 }
