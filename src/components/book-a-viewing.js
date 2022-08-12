@@ -428,22 +428,22 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         }
 
         return (
-            <div className={"col-span-2 ring ring-1 ring-red-500 rounded-md p-5 my-5 w-full"}>
-                <div className="flex">
-                    {
-                        Object.keys(errors).map(key => (
-                            <div className={"flex"} key={key}>
-                                <div className={"flex justify-start items-center"}>
-                                    <XCircleIcon className={"text-red-600 h-10 w-10"} />
-                                </div>
-                                <div className={"flex text-red-600 items-center ml-2"}>
-                                    {errors[key].message}
-                                </div>
+          <div className="col-span-2 mt-4">
+              <div className="rounded-md bg-red-400 p-4">
+                  <div className="flex">
+                      <div className="flex-shrink-0 items-center flex">
+                          <XCircleIcon className="h-7 w-7 text-white" aria-hidden="true" />
+                      </div>
+                      {
+                          Object.keys(errors).map(key => (
+                            <div className="ml-3 flex-1 md:flex md:justify-between text-center">
+                                <p className={"text-white"}>{errors[key].message}</p>
                             </div>
-                        ))
-                    }
-                </div>
-            </div>
+                          ))
+                      }
+                  </div>
+              </div>
+          </div>
         )
 
     }
