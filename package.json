@@ -62,7 +62,10 @@
     "webpack": "^5"
   },
   "dependencies": {
+    "fs": "^0.0.1-security",
+    "mssql": "^9.0.0",
     "npm": "^8.16.0",
+    "seriate": "^4.0.0",
     "update": "^0.7.4"
   }
 }
