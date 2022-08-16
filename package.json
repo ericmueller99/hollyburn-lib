@@ -34,6 +34,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
     "moment": "^2.29.4",
+    "next": "^12.2.5",
     "postcss": "^8.4.14",
     "postcss-loader": "^7.0.1",
     "postcss-preset-env": "^7.7.2",
@@ -52,18 +53,23 @@
     "@headlessui/react": "^1.6.6",
     "axios": "^0.27.2",
     "moment": "^2.29.4",
+    "next": "^12.2.5",
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.33.1",
-    "next": "^12.2.2"
+    "fs": "^0.0.1-security"
   },
   "resolutions": {
     "webpack": "^5"
   },
   "dependencies": {
+    "fs": "^0.0.1-security",
+    "mmmagic-type": "^1.0.0",
     "mssql": "^9.0.0",
     "npm": "^8.16.0",
+    "path": "^0.12.7",
+    "request": "^2.88.2",
     "seriate": "^4.0.0",
     "update": "^0.7.4"
   }

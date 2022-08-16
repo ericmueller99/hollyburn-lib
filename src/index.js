@@ -8,12 +8,7 @@ import {BasicForm} from "./components/basic-form";
 import {BookAViewing} from "./components/book-a-viewing";
 import {LoadingWidget} from "./components/utils";
 import {buttonTailwindClasses} from "./lib/helpers";
-import {dbConnections} from "./lib/dbEntities/connections";
-import {propertiesEntity} from "./lib/dbEntities/properties";
-import {checkFolderExists} from "./lib/node-common";
 
-// const {checkFolderExists} = require('./lib/node-common');
 export {
-    QualifyForm, Header, ThankYou, Footer, Fonts, BasicForm, BookAViewing, LoadingWidget, buttonTailwindClasses,
-    propertiesEntity, dbConnections, checkFolderExists
+    QualifyForm, Header, ThankYou, Footer, Fonts, BasicForm, BookAViewing, LoadingWidget, buttonTailwindClasses
 }
