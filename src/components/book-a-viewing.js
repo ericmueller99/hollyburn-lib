@@ -4,7 +4,7 @@ import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/re
 import moment from "moment";
 import {
     buttonTailwindClasses,
-    formatDate,
+    formatDate, formatDateMMMD,
     formHolderTailwindClasses,
     formTailwindClasses,
     labelTailwindClasses,
@@ -192,6 +192,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 return true;
             })
             setSuiteOptions(filteredVacancies);
+            console.log(filteredVacancies);
         }
         else {
             setSuiteOptions(vacancies);
@@ -325,21 +326,32 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         Choose suites that match your preference. <br />
                         <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
                     </p>
-                    <div className={"mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4"}>
+                    <div className={"mt-4 grid grid-cols-1 gap-y-6"}>
                         {
                             suiteOptions.map(s => (
-                                <label className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : 'hover:border-hbBlue'} relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
-                                    <input type="checkbox" name="suites" value={s.vacancyId} className={"sr-only"} {...register('suites', {required: 'Please select atleast one suite'})} disabled={suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? true: false} />
-                                    <span className={"flex-1 flex"}>
-                                        <span className={"flex flex-col"}>
-                                            <CheckCircleIcon className={`${suiteWatchCleaned.includes(s.vacancyId) ? 'h-7 w-7 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2' : 'hidden'}`} />
-                                            <span className={"block text-sm font-medium text-gray-900"}>Unit: {s.unitNumber} - {bedroomToText(s.bedrooms)}</span>
-                                            <span className={"block text-sm font-medium text-gray-900"}>Asking Rent: ${s.askingRent} monthly</span>
-                                            <span className={"block text-sm font-medium text-gray-900"}>Available from: {s.availableDate}</span>
-                                            <span className={"block text-xs text-gray-900"}>{s.features.toString().replace(/,/g, ', ')}, {s.flooring}, {s.countertops}</span>
+                              <div className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : ''} relative bg-white border rounded-md shadow-xl p-4 flex focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
+                                  <input type="checkbox" id={`${s.vacancyId}-suite`} name="suites" value={s.vacancyId} className={"sr-only"} {...register('suites', {required: 'Please select atleast one suite'})} disabled={suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? true: false} />
+                                  <span className={"flex-1 flex"}>
+                                        {/*Image*/}
+                                      <span className="flex flex-none basis-1/2 pr-5">
+                                            <img src={s.images[0]} alt={`${s.unitNumber} Image`} />
+                                        </span>
+                                        <span className="md:flex md:flex-none md:basis-1/2">
+                                            <span className={"flex flex-col gap-y-2"}>
+                                                {/*<CheckCircleIcon className={`${suiteWatchCleaned.includes(s.vacancyId) ? 'h-7 w-7 text-green-600 absolute right-3 top-1/2 transform -translate-y-1/2' : 'hidden'}`} />*/}
+                                                <span className={"block text-xl font-medium text-hbGray"}>{s.unitNumber} {bedroomToText(s.bedrooms)}</span>
+                                                <span className={"block text-lg font-medium text-hbLightGrayText"}>Available {formatDateMMMD(s.availableDate)} from</span>
+                                                <span className={"block text-xl font-medium text-hbGray"}>${s.askingRent} monthly</span>
+                                                <span className={"block text-xs text-gray-900"}>{s.features.toString().replace(/,/g, ', ')}, {s.flooring}, {s.countertops}</span>
+                                                <span className="block justify-end">
+                                                    <label htmlFor={`${s.vacancyId}-suite`} className="cursor-pointer bg-hbOrange hover:bg-hbOrangeHover mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium">
+                                                        {suiteWatchCleaned.includes(s.vacancyId) ? 'Selected' : 'Select'}
+                                                    </label>
+                                                </span>
+                                            </span>
                                         </span>
                                     </span>
-                                </label>
+                              </div>
                             ))
                         }
                     </div>
@@ -367,7 +379,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         {
                             dayOptions.map(day => {
                                 return day.availableSlots ?
-                                    <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${day.value === dayWatch ? 'border border-hbBlue' : ''}`} key={day.value}>
+                                    <label className={`relative bg-white border rounded-md shadow-xl p-4 flex cursor-pointer focus:outline-none ${day.value === dayWatch ? 'border border-hbBlue' : ''}`} key={day.value}>
                                         <input type="radio" name="date" value={day.value} className={"sr-only"} {...register('date', {required: 'Please select a viewing day.'})} />
                                         <span className={"flex-1 flex"}>
                                             <div className={"flex w-3/4"}>
@@ -416,16 +428,16 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4"}>
                         {
                             timeOptions.map(t => (
-                                <label className={`relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none ${timeWatch === t.value ? 'border border-hbBlue' :''}`} key={t.key}>
+                                <label className={`relative bg-white border rounded-md shadow-xl p-4 flex cursor-pointer focus:outline-none ${timeWatch === t.value ? 'border border-hbBlue' :''}`} key={t.key}>
                                     <input type="radio" name="timeslot" className={"sr-only"} {...register('timeslot', {required: 'Please select a viewing time.'})} value={t.value} />
-                                    <span className={"flex-1 flex"}>
-                                        <span className={"flex flex-none w-3/4 justify-center"}>
-                                            <span className={"block text-sm font-medium text-gray-900"}>{t.start} - {t.end}</span>
+                                    <span className={"flex-1 flex items-center justify-between"}>
+                                        <span>
+                                            <span className="text-sm font-medium text-gray-900 text-center">{t.start}</span>
+                                            <span className="text-sm font-medium text-gray-900 text-center">-</span>
+                                            <span className="text-sm font-medium text-gray-900 text-center">{t.end}</span>
                                         </span>
-                                        <span className={"flex items-center w-1/4 flex-none justify-center"}>
-                                            <CheckCircleIcon className={`${timeWatch === t.value ? 'h-6 w-6 text-green-600' : 'hidden'}`} />
-                                        </span>
-                                </span>
+                                        <CheckCircleIcon className={timeWatch === t.value ? 'h-6 w-6 text-green-600' : 'hidden'} />
+                                    </span>
                                 </label>
                             ))
                         }
@@ -545,11 +557,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 {showUpdatePrefsBanner && vacancyDisplayTypeWatch === 'yes' && handleUpdatePrefs && typeof handleUpdatePrefs === 'function' && propertyOptions.length > 0 &&
                     <div className={"col-span-2"}>
                         <div className="rounded-md bg-white p-4 border border-gray-300">
-                            <div className={"flex"}>
-                                <div className="flex-shrink-0 items-center flex">
+                            <div className="flex">
+                                <div className="hidden md:flex-shrink-0 md:items-center md:flex">
                                     <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
                                 </div>
-                                <div className="flex-1 md:flex md:justify-between">
+                                <div className="flex-1 flex justify-between items-center space-y-2">
                                     <p className="flex items-center ml-1">Not seeing what you need?</p>
                                     <p className="flex items-center">
                                         <button type="button" className={"w-full inline-flex items-center justify-center px-6 py-1 border border-transparent rounded-md shadow-sm text-base " +

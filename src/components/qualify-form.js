@@ -10,7 +10,7 @@ import {
     buttonTailwindClasses,
     checkboxTailwindClasses, formHolderTailwindClasses,
     formTailwindClasses,
-    labelTailwindClasses, txtInputHolderTailwindClasses,
+    labelTailwindClasses, suiteTypeMapper, txtInputHolderTailwindClasses,
     txtInputTailwindClasses
 } from "../lib/helpers";
 
@@ -24,33 +24,15 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {label: 4, value: 4},
         {label: 5, value: 5},
     ]
-    const suiteTypeOptions = [
-        {name: 'Studio', value: 0, fieldName: 'suiteType-0'},
-        {name: "1 Bedroom", value: 1, fieldName: 'suiteType-1'},
-        {name: '2 Bedroom', value: 2, fieldName: 'suiteType-2'},
-        {name: "3 Bedroom", value: 3, fieldName: 'suiteType-3'}
-    ]
-    const cityOptions = [
-        {name: 'Ottawa', value: 'Ottawa', fieldName: 'city-ottawa'},
-        {name: 'Vancouver', value: 'Vancouver', fieldName: 'city-vancouver'},
-        {name: 'Toronto', value: 'Toronto', fieldName: 'city-toronto'},
-        {name: 'Calgary', value: 'Calgary', fieldName: 'city-calgary'},
-        {name: 'West Vancouver', value: 'West Vancouver', fieldName: 'city-westVancouver'},
-        {name: 'North Vancouver', value: 'North Vancouver', fieldName: 'city-northVancouver'}
-    ];
-    const neighbourhoodOptions = [
-        {name: 'West End', value: 'West End', fieldName: 'west-end', inCity: 'Vancouver'},
-        {name: 'South Granville', value: 'South Granville', fieldName: 'south-granville', inCity: 'Vancouver'},
-        {name: 'Kitsilano', value: 'Kitsilano', fieldName: 'kitsilano', inCity: 'Vancouver'},
-        {name: 'UBC Point Grey', value: 'UBC Point Grey', fieldName: 'ubc', inCity: 'Vancouver'},
-        {name: 'Kerrisdale', value: 'Kerrisdale', fieldName: 'kerrisdale', inCity: 'Vancouver'},
-        {name: 'Oakridge', value: 'Oakridge', fieldName: 'oakridge', inCity: 'Vancouver'},
-        {name: 'Marpole', value: 'Marpole', fieldName: 'marpole', inCity: 'Vancouver'},
-        {name: 'Downtown Toronto', value: 'Downtown Toronto', fieldName: 'downtown-toronto', inCity: 'Toronto'},
-        {name: 'The Annex', value: 'The Annex', fieldName: 'the-annex', inCity: 'Toronto'},
-        {name: 'Etobicoke', value: 'Etobicoke', fieldName: 'etobicoke', inCity: 'Toronto'},
-        {name: 'Yorkville', value: 'Yorkville', fieldName: 'yorkville', inCity: 'Toronto'},
-    ];
+    // const suiteTypeOptions = [
+    //     {name: 'Studio', value: 0, fieldName: 'suiteType-0'},
+    //     {name: "1 Bedroom", value: 1, fieldName: 'suiteType-1'},
+    //     {name: '2 Bedroom', value: 2, fieldName: 'suiteType-2'},
+    //     {name: "3 Bedroom", value: 3, fieldName: 'suiteType-3'}
+    // ]
+    const [cityOptions, setCityOptions] = React.useState([]);
+    const [neighbourhoodOptions, setNeighbourhoodOptions] = React.useState([]);
+    const [suiteTypeOptions, setSuiteTypeOptions] = React.useState([]);
 
     const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton,
         formClasses = formTailwindClasses(), textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(),
@@ -58,6 +40,79 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         buttonClasses = buttonTailwindClasses()
 
     } = options;
+
+    //get city options
+    React.useEffect(() => {
+
+        if (cityOptions.length > 0) {
+            return;
+        }
+
+        axios.get('https://api.hollyburn.com/properties/cities')
+          .then(res => {
+              const cities = res.data;
+              const formattedCities = cities.map(c => {
+                  return {name: c, value: c, fieldName: `city-${c}`};
+              })
+              setCityOptions(formattedCities);
+          })
+          .catch(error => {
+              console.log('error getting cities');
+              console.log(error);
+          })
+
+    }, [cityOptions]);
+    //get neighbourhood options
+    React.useEffect(() => {
+
+        if (neighbourhoodOptions.length > 0) {
+            return;
+        }
+
+        axios.get('https://api.hollyburn.com/properties/neighbourhoods')
+          .then(res => {
+              const neighbourhoods = res.data;
+              const formattedNeighbourhoods = neighbourhoods.map(n => {
+                  return {
+                      name: n.name,
+                      inCity: n.inCity,
+                      fieldName: n.name.replace(/ /g, '-')
+                  }
+              })
+              setNeighbourhoodOptions(formattedNeighbourhoods);
+          })
+          .catch(error => {
+              console.log('there was an error getting neighbourhoods');
+              console.log(error);
+          })
+
+    }, [neighbourhoodOptions])
+    //get suite type options
+    React.useEffect(() => {
+
+        if (suiteTypeOptions.length > 0) {
+            return;
+        }
+
+        console.log('getting suite type options');
+        axios.get('https://api.hollyburn.com/properties/bedroom-types')
+          .then(res => {
+              const suiteTypes = res.data;
+              const formattedSuiteTypes = suiteTypes.map(s => {
+                  return {
+                      name: suiteTypeMapper(s),
+                      value: s,
+                      fieldName: `suiteType-${s}`
+                  }
+              })
+              setSuiteTypeOptions(formattedSuiteTypes);
+          })
+          .catch(error => {
+              console.log('there was an error getting bedroom types');
+              console.log(error);
+          })
+
+    }, [suiteTypeOptions]);
 
     const {control, register, handleSubmit, formState: {errors}, setError, setValue, getValues} = useForm({
         defaultValues: {
@@ -220,7 +275,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                         *Phone Number
                     </label>
                     <div className={"mt-1"}>
-                        <input type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} title="Phone Number" />
+                        <input type={"tel"} className={textInputClasses} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 20, minLength:10})} title="Phone Number" />
                         {errors.phoneNumber && <p className={'text-red-600'}>Valid phone number is required.</p>}
                     </div>
                 </div>

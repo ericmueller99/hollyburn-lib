@@ -76,7 +76,7 @@ export function BasicForm({stateSetter, firstName, lastName, emailAddress, phone
                 {/*Phone Number*/}
                 <div className={textInputHolderClasses}>
                     <label htmlFor={"phoneNumber"} className={labelClasses}>*Phone Number</label>
-                    <input type={"text"} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 50})} className={textInputClasses} title="Phone Number" />
+                    <input type={"text"} {...register('phoneNumber', {pattern: /^(0|[1-9]\d*)(\.\d+)?$/,required: true, maxLength: 20, minLength:10})} className={textInputClasses} title="Phone Number" />
                     {errors.phoneNumber && <p className={"text-red-600"}>Phone number is not valid.</p> }
                 </div>
 

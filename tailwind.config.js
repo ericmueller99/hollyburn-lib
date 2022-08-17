@@ -12,11 +12,15 @@ module.exports = {
         'hbLightGray': '#f5f5f5',
         'footerBorder': '#c8c6c5',
         'fontGray': "#868686",
-        'hbBlue': '#003976'
+        'hbBlue': '#003976',
+        'hbLightGrayText': '#959595'
       },
       backgroundImage: {
         'qualifyCard': "url('/images/sidebar-img.jpg')",
         'footerHero': 'url(/images/footer-img.jpg)'
+      },
+      screens: {
+        'xs': ''
       }
     },
   },
