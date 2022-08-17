@@ -326,7 +326,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         Choose suites that match your preference. <br />
                         <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
                     </p>
-                    <div className={"mt-4 grid grid-cols-1 gap-y-6"}>
+                    <div className={"mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-y-6 lg:gap-x-4"}>
                         {
                             suiteOptions.map(s => (
                               <div className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : ''} relative bg-white border rounded-md shadow-xl p-4 flex focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
