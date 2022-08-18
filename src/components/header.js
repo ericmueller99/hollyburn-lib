@@ -125,15 +125,12 @@ export function Header() {
                         </div>
                     </div>
 
+                    {/*Mobile menu*/}
                     <Disclosure.Panel className="lg:hidden">
                         <div className="pt-2 pb-3 space-y-1">
 
-
-
                         </div>
                     </Disclosure.Panel>
-
-
                 </>
             )}
         </Disclosure>

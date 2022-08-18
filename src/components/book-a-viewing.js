@@ -334,7 +334,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         Choose suites that match your preference. <br />
                         <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
                     </p>
-                    <div className={"mt-4 grid grid-cols-1 lg:grid-cols-2 gap-y-6 lg:gap-x-4"}>
+                    <div className={"mt-4 grid grid-cols-1 2xl:grid-cols-2 gap-y-6 lg:gap-x-4"}>
                         {
                             suiteOptions.map(s => (
                               <div className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : ''} relative bg-white border rounded-md shadow-xl p-4 flex focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
@@ -566,7 +566,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     <div className={"col-span-2"}>
                         <div className="rounded-md bg-white p-4 border border-gray-300">
                             <div className="flex">
-                                <div className="hidden md:flex-shrink-0 md:items-center md:flex">
+                                <div className="hidden md:flex-shrink-0 md:items-center md:flex lg:hidden">
                                     <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
                                 </div>
                                 <div className="flex-1 flex justify-between items-center space-y-2">
@@ -592,10 +592,10 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                                 {
                                     propertyOptions.map(p => {
                                         return (
-                                          <optgroup label={p.optGroup}>
+                                          <optgroup label={p.optGroup} key={p.optGroup}>
                                               {
                                                   p.data.map(d => (
-                                                    <option value={d.value}>{d.label}</option>
+                                                    <option value={d.value} key={d.value}>{d.label}</option>
                                                   ))
                                               }
                                           </optgroup>
