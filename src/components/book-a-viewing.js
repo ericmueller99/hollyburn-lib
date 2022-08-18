@@ -1,6 +1,8 @@
 import React  from 'react';
 import {useForm} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
+import { Transition } from '@headlessui/react'
+
 import moment from "moment";
 import {
     buttonTailwindClasses,
@@ -8,7 +10,8 @@ import {
     formHolderTailwindClasses,
     formTailwindClasses,
     labelTailwindClasses,
-    txtInputTailwindClasses
+    txtInputTailwindClasses,
+    propertyOptGroupBuilder, hbOrangeButtonClasses
 } from "../lib/helpers";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
@@ -16,7 +19,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
         showUpdatePrefsBanner, handleUpdatePrefs, formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
-        buttonClasses = buttonTailwindClasses()
+        buttonClasses = buttonTailwindClasses(), hbOrangeButton = hbOrangeButtonClasses()
     } = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
@@ -81,9 +84,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         return false;
                     }
                     if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
-                        if (p.propertyName === 'Hollyburn Gardens') {
-                            console.log(!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms)))
-                        }
                         if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
                             return false;
                         }
@@ -112,10 +112,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             }).map(p => {
                 return {
                     label: p.propertyName,
-                    value: p.propertyHMY
+                    value: p.propertyHMY,
+                    optGroup: p.city
                 }
             });
-            setPropertyOptions(properties);
+            setPropertyOptions(propertyOptGroupBuilder(properties));
         }
         else {
             const properties = vacancyFeed.filter(p => {
@@ -128,10 +129,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             }).map(p => {
                 return {
                     label: p.propertyName,
-                    value: p.propertyHMY
+                    value: p.propertyHMY,
+                    optGroup: p.city
                 }
             });
-            setPropertyOptions(properties);
+            setPropertyOptions(propertyOptGroupBuilder(properties));
         }
 
         //if there is a vacancy Id then prefill the form.
@@ -350,7 +352,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                                                 <span className={"block text-xl font-medium text-hbGray"}>${s.askingRent} monthly</span>
                                                 <span className={"block text-xs text-gray-900"}>{s.features.toString().replace(/,/g, ', ')}, {s.flooring}, {s.countertops}</span>
                                                 <span className="block justify-end">
-                                                    <label htmlFor={`${s.vacancyId}-suite`} className="cursor-pointer bg-hbOrange hover:bg-hbOrangeHover mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium">
+                                                    <label htmlFor={`${s.vacancyId}-suite`} className={hbOrangeButton}>
                                                         {suiteWatchCleaned.includes(s.vacancyId) ? 'Selected' : 'Select'}
                                                     </label>
                                                 </span>
@@ -588,12 +590,31 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                             <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
                                 <option value={"Please Select..."} disabled>Please Select...</option>
                                 {
-                                    propertyOptions.map(p => (
-                                        <option value={p.value} key={p.value}>{p.label}</option>
-                                    ))
+                                    propertyOptions.map(p => {
+                                        return (
+                                          <optgroup label={p.optGroup}>
+                                              {
+                                                  p.data.map(d => (
+                                                    <option value={d.value}>{d.label}</option>
+                                                  ))
+                                              }
+                                          </optgroup>
+                                        )
+                                    })
                                 }
                             </select>
                         </div>
+                        <Transition
+                          show={propertyWatch && propertyWatch !== 'Please Select...' ? true : false}
+                          enter="transition ease duration-700 transform"
+                          enterFrom="opacity-0 -translate-y-full"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease duration-1000 transform"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 -translate-y-full"
+                        >
+                            <a href={vacancyFeed.filter(v => parseInt(v.propertyHMY) === parseInt(propertyWatch)).map(p => p.websiteUrl)} className={hbOrangeButton} target={"_blank"}>View Property Details</a>
+                        </Transition>
                     </div>
                 }
                 {
