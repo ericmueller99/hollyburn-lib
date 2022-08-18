@@ -14,9 +14,8 @@ import {
     txtInputTailwindClasses
 } from "../lib/helpers";
 
-export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
+export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, petFriendly, utmCampaign, utmSource, utmMedium, utmContent, utmTerm, stateSetter, options = {}}) {
 
-    //TODO update these to pull from Salesforce
     const occupantOptions = [
         {label: 1, value: 1},
         {label: 2, value: 2},
@@ -24,12 +23,6 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {label: 4, value: 4},
         {label: 5, value: 5},
     ]
-    // const suiteTypeOptions = [
-    //     {name: 'Studio', value: 0, fieldName: 'suiteType-0'},
-    //     {name: "1 Bedroom", value: 1, fieldName: 'suiteType-1'},
-    //     {name: '2 Bedroom', value: 2, fieldName: 'suiteType-2'},
-    //     {name: "3 Bedroom", value: 3, fieldName: 'suiteType-3'}
-    // ]
     const [cityOptions, setCityOptions] = React.useState([]);
     const [neighbourhoodOptions, setNeighbourhoodOptions] = React.useState([]);
     const [suiteTypeOptions, setSuiteTypeOptions] = React.useState([]);
@@ -76,7 +69,8 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                   return {
                       name: n.name,
                       inCity: n.inCity,
-                      fieldName: n.name.replace(/ /g, '-')
+                      fieldName: n.name.replace(/ /g, '-'),
+                      value: n.name
                   }
               })
               setNeighbourhoodOptions(formattedNeighbourhoods);
@@ -116,7 +110,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     const {control, register, handleSubmit, formState: {errors}, setError, setValue, getValues} = useForm({
         defaultValues: {
-            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants
+            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, petFriendly
         }
     });
     const [isLoading, setIsLoading] = React.useState(false);
@@ -125,16 +119,20 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     function NeighbourhoodOptions({control}) {
 
+
         //subscribing to change events for the cities options
         const cities = useWatch({
             control,
             name: 'cities'
         });
-        if (cities) {
+        if (cities && neighbourhoodOptions && neighbourhoodOptions.length > 0) {
 
             //which neighbourhoods should be shown ?
             const neighbourhoods = neighbourhoodOptions.filter(n => cities.includes(n.inCity));
+            // console.log(neighbourhoods);
             const selectedNeighbourhoods = getValues('neighbourhoods');
+            console.log(getValues('neighbourhoods'));
+            console.log(neighbourhoods);
             if (selectedNeighbourhoods && selectedNeighbourhoods.length > 0) {
                 const validSelectedNeighbourhoods = neighbourhoods.filter(n => {
                     return !!selectedNeighbourhoods.includes(n.value);
@@ -181,6 +179,8 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     const onSubmit = (data) => {
 
         data = {...data, utmCampaign, utmSource, utmMedium, utmContent, utmTerm}
+
+        console.log(data);
 
         //date checks
         const currentDate = moment();

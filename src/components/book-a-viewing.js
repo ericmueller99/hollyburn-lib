@@ -71,6 +71,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 if (!p.hasVacancy) {
                     return false;
                 }
+                if (preferences.petFriendly) {
+                    if (!p.petFriendly) {
+                        return false;
+                    }
+                }
                 const matchedVacancies = p.vacancies.filter(v => {
                     if (v.furnishedRental) {
                         return false;
@@ -129,6 +134,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             setPropertyOptions(properties);
         }
 
+        //if there is a vacancy Id then prefill the form.
         if (vacancyId) {
             try {
                 if (parseInt(vacancyId)) {
