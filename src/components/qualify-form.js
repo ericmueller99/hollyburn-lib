@@ -88,7 +88,6 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             return;
         }
 
-        console.log('getting suite type options');
         axios.get('https://api.hollyburn.com/properties/bedroom-types')
           .then(res => {
               const suiteTypes = res.data;
@@ -129,18 +128,13 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
             //which neighbourhoods should be shown ?
             const neighbourhoods = neighbourhoodOptions.filter(n => cities.includes(n.inCity));
-            // console.log(neighbourhoods);
             const selectedNeighbourhoods = getValues('neighbourhoods');
-            console.log(getValues('neighbourhoods'));
-            console.log(neighbourhoods);
             if (selectedNeighbourhoods && selectedNeighbourhoods.length > 0) {
                 const validSelectedNeighbourhoods = neighbourhoods.filter(n => {
                     return !!selectedNeighbourhoods.includes(n.value);
                 }).map(n => n.value);
                 setValue('neighbourhoods', validSelectedNeighbourhoods);
             }
-
-            // console.log(getValues('neighbourhoods'));
 
             if (neighbourhoods.length === 0) {
                 return '';
@@ -179,8 +173,6 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     const onSubmit = (data) => {
 
         data = {...data, utmCampaign, utmSource, utmMedium, utmContent, utmTerm}
-
-        console.log(data);
 
         //date checks
         const currentDate = moment();
