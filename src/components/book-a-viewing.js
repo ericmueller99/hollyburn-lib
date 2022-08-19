@@ -6,20 +6,28 @@ import { Transition } from '@headlessui/react'
 import moment from "moment";
 import {
     buttonTailwindClasses,
-    formatDate, formatDateMMMD,
+    formatDate,
+    formatDateMMMD,
     formHolderTailwindClasses,
     formTailwindClasses,
     labelTailwindClasses,
     txtInputTailwindClasses,
-    propertyOptGroupBuilder, hbOrangeButtonClasses
+    propertyOptGroupBuilder,
+    hbOrangeButtonClasses,
+    filterProperties,
+    filterPropertiesWithPrefs,
+    getVacancyFeed,
+    availableSuiteHolderTailwindClasses
 } from "../lib/helpers";
+import {PropertySelectWithOptGroup} from "./form-fields";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
         showUpdatePrefsBanner, handleUpdatePrefs, formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
-        buttonClasses = buttonTailwindClasses(), hbOrangeButton = hbOrangeButtonClasses()
+        buttonClasses = buttonTailwindClasses(), hbOrangeButton = hbOrangeButtonClasses(), availableSuiteHolderClasses = availableSuiteHolderTailwindClasses(),
+        textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses()
     } = options;
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
@@ -39,8 +47,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     const timeWatch = watch('timeslot');
     const [preferences, setPreferences] = React.useState(formPrefs)
     const vacancyDisplayTypeWatch = watch('vacancyDisplayType');
-    const labelClasses = labelTailwindClasses();
-    const textInputClasses = txtInputTailwindClasses();
 
     //get the vacancy feed.  this contains properties and all vacant units that we can use to populate the form.
     React.useEffect(() => {
@@ -52,16 +58,17 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         console.log('getting vacancy feed!');
         setIsLoading(true);
         setRefreshFeed(false);
-        fetch('https://api.hollyburn.com/properties/vacancies')
-            .then(res => res.json())
-            .then(data => {
-                setVacancyFeed(data);
-                setIsLoading(false);
-            })
-            .catch(error => {
-                setIsLoading(false);
-                throw error;
-            })
+
+        //getting the vacancy feed.
+        getVacancyFeed()
+          .then(data => {
+              setVacancyFeed(data);
+              setIsLoading(false);
+          })
+          .catch(error => {
+              setIsLoading(false);
+              throw error;
+          });
 
     }, [refreshFeed]);
 
@@ -70,69 +77,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //if there are preferences and the vacancyDisplayWatch === 'yes' then applying those preferences
         if (preferences && vacancyDisplayTypeWatch === 'yes') {
-            const properties = vacancyFeed.filter(p => {
-                if (!p.hasVacancy) {
-                    return false;
-                }
-                if (preferences.petFriendly) {
-                    if (!p.petFriendly) {
-                        return false;
-                    }
-                }
-                const matchedVacancies = p.vacancies.filter(v => {
-                    if (v.furnishedRental) {
-                        return false;
-                    }
-                    if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
-                        if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
-                            return false;
-                        }
-                    }
-                    if (preferences.maxBudget) {
-                        if (parseInt(preferences.maxBudget) < parseInt(v.askingRent)) {
-                            return false
-                        }
-                    }
-                    return true;
-                })
-                if (!matchedVacancies || matchedVacancies.length === 0) {
-                    return false;
-                }
-                if (preferences.cities && preferences.cities.length > 0) {
-                    if (!preferences.cities.includes(p.city)) {
-                        return false
-                    }
-                }
-                if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
-                    if (!preferences.neighbourhoods.includes(p.neighbourhood) && p.neighbourhood !== p.city) {
-                        return false;
-                    }
-                }
-                return true;
-            }).map(p => {
-                return {
-                    label: p.propertyName,
-                    value: p.propertyHMY,
-                    optGroup: p.city
-                }
-            });
+            const properties = filterPropertiesWithPrefs(vacancyFeed, preferences);
             setPropertyOptions(propertyOptGroupBuilder(properties));
         }
         else {
-            const properties = vacancyFeed.filter(p => {
-                if (!p.hasVacancy) {
-                    return false;
-                }
-                const unfurnishedVacancies = p.vacancies.filter(v => !v.furnishedRental);
-                return unfurnishedVacancies.length !== 0;
-
-            }).map(p => {
-                return {
-                    label: p.propertyName,
-                    value: p.propertyHMY,
-                    optGroup: p.city
-                }
-            });
+            const properties = filterProperties(vacancyFeed);
             setPropertyOptions(propertyOptGroupBuilder(properties));
         }
 
@@ -334,7 +283,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         Choose suites that match your preference. <br />
                         <span className={"text-xs"}>(Up to a maximum of 3 suites)</span>
                     </p>
-                    <div className={"mt-4 grid grid-cols-1 2xl:grid-cols-2 gap-y-6 lg:gap-x-4"}>
+                    <div className={availableSuiteHolderClasses}>
                         {
                             suiteOptions.map(s => (
                               <div className={`${suiteWatchCleaned.length > 2 && !suiteWatchCleaned.includes(s.vacancyId) ? 'cursor-not-allowed' : ''} relative bg-white border rounded-md shadow-xl p-4 flex focus:outline-none ${suiteWatchCleaned.includes(s.vacancyId) ? 'border border-hbBlue' : ''}`} key={s.vacancyId}>
@@ -587,22 +536,23 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     <div className={"col-span-2"}>
                         <label htmlFor={"property"} className={labelClasses}>Select a Property <br/> <span className={"text-xs"}>{vacancyDisplayTypeWatch === 'yes' ? '(Vacancies are filtered by your preferences)' : '(Only properties with vacancies are displayed)'}</span> </label>
                         <div className={"mt-1"}>
-                            <select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>
-                                <option value={"Please Select..."} disabled>Please Select...</option>
-                                {
-                                    propertyOptions.map(p => {
-                                        return (
-                                          <optgroup label={p.optGroup} key={p.optGroup}>
-                                              {
-                                                  p.data.map(d => (
-                                                    <option value={d.value} key={d.value}>{d.label}</option>
-                                                  ))
-                                              }
-                                          </optgroup>
-                                        )
-                                    })
-                                }
-                            </select>
+                            <PropertySelectWithOptGroup propertyOptions={propertyOptions} register={register} tailwindClasses={textInputClasses} />
+                            {/*<select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>*/}
+                            {/*    <option value={"Please Select..."} disabled>Please Select...</option>*/}
+                            {/*    {*/}
+                            {/*        propertyOptions.map(p => {*/}
+                            {/*            return (*/}
+                            {/*              <optgroup label={p.optGroup} key={p.optGroup}>*/}
+                            {/*                  {*/}
+                            {/*                      p.data.map(d => (*/}
+                            {/*                        <option value={d.value} key={d.value}>{d.label}</option>*/}
+                            {/*                      ))*/}
+                            {/*                  }*/}
+                            {/*              </optgroup>*/}
+                            {/*            )*/}
+                            {/*        })*/}
+                            {/*    }*/}
+                            {/*</select>*/}
                         </div>
                         <Transition
                           show={propertyWatch && propertyWatch !== 'Please Select...' ? true : false}

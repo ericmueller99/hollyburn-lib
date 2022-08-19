@@ -51,6 +51,10 @@ export const hbOrangeButtonClasses = () => {
     return 'cursor-pointer bg-hbOrange hover:bg-hbOrangeHover mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium';
 }
 
+export const availableSuiteHolderTailwindClasses = () => {
+    return 'mt-4 grid grid-cols-1 2xl:grid-cols-2 gap-y-6 lg:gap-x-4';
+}
+
 //converts suite type numbers to a friendly name for labels
 export const suiteTypeMapper = (suiteTypeNumber) => {
     const suiteTypesNames = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', '4 Bedroom', '5 Bedroom'];
@@ -88,4 +92,86 @@ export const propertyOptGroupBuilder = (propertyOptions) => {
         }
     })
     return options.sort(sortOptGroups);
+}
+
+//filter properties for book a viewing
+export const filterProperties = (vacancyFeed) => {
+    console.log(vacancyFeed);
+    return vacancyFeed.filter(p => {
+        if (!p.hasVacancy) {
+            return false;
+        }
+        const unfurnishedVacancies = p.vacancies.filter(v => !v.furnishedRental);
+        return unfurnishedVacancies.length !== 0;
+    }).map(p => {
+        return {
+            label: p.propertyName,
+            value: p.propertyHMY,
+            optGroup: p.city
+        }
+    });
+}
+
+//filter properties with preferences
+export const filterPropertiesWithPrefs = (vacancyFeed, preferences) => {
+    return vacancyFeed.filter(p => {
+        if (!p.hasVacancy) {
+            return false;
+        }
+        if (preferences.petFriendly) {
+            if (!p.petFriendly) {
+                return false;
+            }
+        }
+        const matchedVacancies = p.vacancies.filter(v => {
+            if (v.furnishedRental) {
+                return false;
+            }
+            if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
+                if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
+                    return false;
+                }
+            }
+            if (preferences.maxBudget) {
+                if (parseInt(preferences.maxBudget) < parseInt(v.askingRent)) {
+                    return false
+                }
+            }
+            return true;
+        })
+        if (!matchedVacancies || matchedVacancies.length === 0) {
+            return false;
+        }
+        if (preferences.cities && preferences.cities.length > 0) {
+            if (!preferences.cities.includes(p.city)) {
+                return false
+            }
+        }
+        if (preferences.neighbourhoods && preferences.neighbourhoods.length > 0) {
+            if (!preferences.neighbourhoods.includes(p.neighbourhood) && p.neighbourhood !== p.city) {
+                return false;
+            }
+        }
+        return true;
+    }).map(p => {
+        return {
+            label: p.propertyName,
+            value: p.propertyHMY,
+            optGroup: p.city
+        }
+    });
+}
+
+//gets the vacancy feed
+export const getVacancyFeed = () => {
+    return new Promise((resolve, reject) => {
+        fetch('https://api.hollyburn.com/properties/vacancies')
+          .then(res => res.json())
+          .then(data => {
+              resolve(data);
+          })
+          .catch(error => {
+              reject(error);
+          })
+    })
 }
