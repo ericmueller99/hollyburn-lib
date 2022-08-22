@@ -52,7 +52,7 @@ export const hbOrangeButtonClasses = () => {
 }
 
 export const availableSuiteHolderTailwindClasses = () => {
-    return 'mt-4 grid grid-cols-1 2xl:grid-cols-2 gap-y-6 lg:gap-x-4';
+    return 'mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-y-6 lg:gap-x-4';
 }
 
 //converts suite type numbers to a friendly name for labels
