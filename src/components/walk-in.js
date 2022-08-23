@@ -1,26 +1,37 @@
 import React from 'react';
-import {Transition} from "@headlessui/react";
 import {useForm} from 'react-hook-form';
 import {
-  filterProperties,
+  availableSuiteHolderTailwindClasses, buttonTailwindClasses,
+  filterProperties, filterVacanciesFromProperty,
   formHolderTailwindClasses,
-  formTailwindClasses,
-  getVacancyFeed, labelTailwindClasses,
+  formTailwindClasses, getVacanciesFromIds,
+  getVacancyFeed, hbOrangeButtonClasses, labelTailwindClasses,
   propertyOptGroupBuilder, txtInputTailwindClasses
 } from "../lib/helpers";
 import {LoadingWidget} from "./utils";
-import {PropertySelectWithOptGroup} from "./form-fields";
+import {AvailableSuites, FormErrors, PropertySelectWithOptGroup} from "./form-fields";
 
 export function WalkIn({propertyName, stateSetter, options = {}}) {
 
   const {formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
-    textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses()
+    textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(), availableSuitesHolderClasses=availableSuiteHolderTailwindClasses(),
+    hbOrangeButton = hbOrangeButtonClasses(), buttonText = 'Submit', showBack, handleBackButton, buttonClasses = buttonTailwindClasses()
   } = options;
   const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm();
   const [isLoading, setIsLoading] = React.useState(false);
   const [refreshFeed, setRefreshFeed] = React.useState(true);
   const [vacancyFeed, setVacancyFeed] = React.useState([]);
   const [propertyOptions, setPropertiesOptions] = React.useState([]);
+  const [suiteOptions, setSuiteOptions] = React.useState([]);
+
+  const availableSuitesOptions = {
+    headerText: 'Which suites are you visiting today?',
+    infoText: null
+  }
+
+  //field watches
+  const propertyWatch = watch('property');
+  const suiteWatch = watch('suites')
 
   //getting the vacancy feed
   React.useEffect(() => {
@@ -57,8 +68,44 @@ export function WalkIn({propertyName, stateSetter, options = {}}) {
 
   }, [vacancyFeed])
 
+  //Setting the property
+  React.useEffect(() => {
+
+    if (!propertyWatch) {
+      return;
+    }
+
+    //setting suite options
+    const vacancies = filterVacanciesFromProperty(vacancyFeed, propertyWatch);
+    setSuiteOptions(vacancies);
+
+
+  }, [propertyWatch])
+
   //submit function
   const onSubmit = () => {
+
+    const {property, suites} = data;
+    if (!property || property === 'Please Select...') {
+      setError('property', {message: "Please select a property"});
+      return;
+    }
+
+    if (!stateSetter || typeof stateSetter !== 'function') {
+      console.log('unable to set state. stateSetting is missing or not a function');
+      return;
+    }
+
+    const vacancyIds = Array.isArray(suites) ? suites: [parseInt(suites)];
+    const vacancies = getVacanciesFromIds(vacancyFeed, vacancyIds);
+
+    //setting the state
+    const stateData = {
+      result: true,
+      property: Number(property),
+      suites: vacancies
+    }
+    stateSetter(stateData);
 
   }
 
@@ -78,6 +125,24 @@ export function WalkIn({propertyName, stateSetter, options = {}}) {
           </div>
         </div>
 
+        {/*Available Suites*/}
+        <AvailableSuites availableSuiteHolderClasses={availableSuitesHolderClasses} register={register} suiteOptions={suiteOptions} suiteWatch={suiteWatch} hbOrangeButton={hbOrangeButton} options={availableSuitesOptions} />
+
+        {/*Any form errors*/}
+        <FormErrors errors={errors} />
+
+        {/*Submit Button*/}
+        <div className={"col-span-2 flex justify-end"}>
+          {showBack && handleBackButton &&
+            <>
+              <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
+              &nbsp;
+            </>
+          }
+          <button type={"submit"} className={buttonClasses}>
+            {buttonText}
+          </button>
+        </div>
 
       </form>
 

@@ -2,13 +2,12 @@ import React  from 'react';
 import {useForm} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import {Transition} from '@headlessui/react'
-import {AvailableSuites} from "./available-suites";
+import {AvailableSuites} from "./form-fields";
 
 import moment from "moment";
 import {
     buttonTailwindClasses,
     formatDate,
-    formatDateMMMD,
     formHolderTailwindClasses,
     formTailwindClasses,
     labelTailwindClasses,
@@ -18,9 +17,9 @@ import {
     filterProperties,
     filterPropertiesWithPrefs,
     getVacancyFeed,
-    availableSuiteHolderTailwindClasses, suiteTypeMapper
+    availableSuiteHolderTailwindClasses, filterVacanciesFromProperty, getVacanciesFromIds
 } from "../lib/helpers";
-import {PropertySelectWithOptGroup} from "./form-fields";
+import {PropertySelectWithOptGroup, FormErrors} from "./form-fields";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
@@ -126,35 +125,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //property has been changed
     React.useEffect(() => {
 
-        const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyWatch));
-        if (!selectedProperty) {
+        //if there is no propertyWatch then return early.
+        if (!propertyWatch) {
             return;
         }
 
-        let {vacancies} = selectedProperty || [];
-        vacancies = vacancies.filter(v => !v.furnishedRental);
-
-        //if there are preferences then apply them
-        if (preferences && vacancyDisplayTypeWatch === 'yes' && vacancies && vacancies.length > 0) {
-            const filteredVacancies = vacancies.filter(v => {
-                if (preferences.maxBudget) {
-                    if (parseInt(v.askingRent) > parseInt(preferences.maxBudget)) {
-                        return false;
-                    }
-                }
-                if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
-                    if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
-                        return false;
-                    }
-                }
-                return true;
-            })
-            setSuiteOptions(filteredVacancies);
-            console.log(filteredVacancies);
-        }
-        else {
-            setSuiteOptions(vacancies);
-        }
+        //getting vacancies and setting the suite options from them.
+        const vacancies = filterVacanciesFromProperty(vacancyFeed, propertyWatch, preferences);
+        setSuiteOptions(vacancies);
 
         //resetting fields
         resetField('suites');
@@ -345,34 +323,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         )
     }
 
-    //errors
-    function FormErrors() {
-
-        if (!errors || Object.keys(errors).length === 0) {
-            return '';
-        }
-
-        return (
-          <div className="col-span-2 mt-4">
-              <div className="rounded-md bg-red-400 p-4">
-                  <div className="flex">
-                      <div className="flex-shrink-0 items-center flex">
-                          <XCircleIcon className="h-7 w-7 text-white" aria-hidden="true" />
-                      </div>
-                      {
-                          Object.keys(errors).map(key => (
-                            <div className="ml-3 flex-1 md:flex md:justify-between text-center">
-                                <p className={"text-white"}>{errors[key].message}</p>
-                            </div>
-                          ))
-                      }
-                  </div>
-              </div>
-          </div>
-        )
-
-    }
-
     //form submission
     const onSubmit = (data) => {
 
@@ -383,16 +333,9 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             return;
         }
 
+        //getting vacancies from the selected suites/vacancies
         const vacancyIds = Array.isArray(suites) ? suites : [parseInt(suites)];
-        const vacancies = [];
-        vacancyFeed.filter(p=>p.hasVacancy).map(p => {
-            for (const v of p.vacancies) {
-                if (vacancyIds.includes(v.vacancyId)) {
-                    console.log('matched');
-                    vacancies.push(v);
-                }
-            }
-        })
+        const vacancies = getVacanciesFromIds(vacancyFeed, vacancyIds);
 
         //constructing the state data.
         const stateData = {
@@ -478,22 +421,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                         <label htmlFor={"property"} className={labelClasses}>Select a Property <br/> <span className={"text-xs"}>{vacancyDisplayTypeWatch === 'yes' ? '(Vacancies are filtered by your preferences)' : '(Only properties with vacancies are displayed)'}</span> </label>
                         <div className={"mt-1"}>
                             <PropertySelectWithOptGroup propertyOptions={propertyOptions} register={register} tailwindClasses={textInputClasses} />
-                            {/*<select className={textInputClasses} {...register('property', {required: "Please select a property."})} defaultValue={"Please Select..."}>*/}
-                            {/*    <option value={"Please Select..."} disabled>Please Select...</option>*/}
-                            {/*    {*/}
-                            {/*        propertyOptions.map(p => {*/}
-                            {/*            return (*/}
-                            {/*              <optgroup label={p.optGroup} key={p.optGroup}>*/}
-                            {/*                  {*/}
-                            {/*                      p.data.map(d => (*/}
-                            {/*                        <option value={d.value} key={d.value}>{d.label}</option>*/}
-                            {/*                      ))*/}
-                            {/*                  }*/}
-                            {/*              </optgroup>*/}
-                            {/*            )*/}
-                            {/*        })*/}
-                            {/*    }*/}
-                            {/*</select>*/}
                         </div>
                         <Transition
                           show={propertyWatch && propertyWatch !== 'Please Select...' ? true : false}
@@ -529,7 +456,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 }
 
                 {/*Step 2 - Choose Available Suites*/}
-                <AvailableSuites control={control} availableSuiteHolderClasses={availableSuiteHolderClasses} suiteWatch={suiteWatch} errors={errors} suiteOptions={suiteOptions} register={register} hbOrangeButton={hbOrangeButton} />
+                <AvailableSuites availableSuiteHolderClasses={availableSuiteHolderClasses} suiteWatch={suiteWatch} suiteOptions={suiteOptions} register={register} hbOrangeButton={hbOrangeButton} />
 
                 {/*Step 3 - Choose date */}
                 <AvailableDays control={control} />
@@ -537,7 +464,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 {/*Step 4 - Choose a time slot*/}
                 <AvailableTimeSlots control={control} />
 
-                <FormErrors control={control} />
+                <FormErrors errors={errors} />
 
                 <div className={"col-span-2 flex justify-end"}>
                     {showBack && handleBackButton &&

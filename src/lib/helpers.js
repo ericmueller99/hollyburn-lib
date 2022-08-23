@@ -175,3 +175,51 @@ export const getVacancyFeed = () => {
           })
     })
 }
+
+//return vacancies that match the property from the vacancy feed
+export const filterVacanciesFromProperty = (vacancyFeed, propertyHMY, preferences = null) => {
+
+    //getting vacancies for property and filtering out furnished rentals
+    const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyHMY));
+    if (!selectedProperty) {
+        return [];
+    }
+
+    let {vacancies} = selectedProperty || [];
+    vacancies = vacancies.filter(v => !v.furnishedRental);
+
+    //are there preferences to filter for?
+    if (preferences && vacancies.length > 0) {
+        return vacancies.filter(v => {
+            if (preferences.maxBudget) {
+                if (parseInt(v.askingRent) > parseInt(preferences.maxBudget)) {
+                    return false;
+                }
+            }
+            if (preferences.suiteTypes && preferences.suiteTypes.length > 0) {
+                if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+    else {
+        return vacancies;
+    }
+
+}
+
+//return array of vacancies from the vacancyFeed where the Id is in
+export const getVacanciesFromIds = (vacancyFeed, vacancyIds) => {
+    const vacancies = [];
+    vacancyFeed.filter(p=>p.hasVacancy).map(p => {
+        for (const v of p.vacancies) {
+            if (vacancyIds.includes(v.vacancyId)) {
+                console.log('matched');
+                vacancies.push(v);
+            }
+        }
+    })
+    return vacancies;
+}
