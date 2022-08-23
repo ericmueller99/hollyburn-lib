@@ -64,13 +64,13 @@ export const AvailableSuites = ({register, suiteOptions, suiteWatch, availableSu
                                           {
                                             s.images[0] &&
                                             <span className="relative w-full h-full">
-                                                  <Image src={s.images[0]} alt={`${s.unitNumber} Image`} layout="fill" width={100} height={100} />
+                                                  <Image src={s.images[0]} alt={`${s.unitNumber} Image`} layout="fill" />
                                               </span>
                                           }
                     {
                       !s.images[0] &&
                       <span className="relative w-full h-full">
-                                                  <Image src={noImage} alt="Image not available" layout="fill" width={100} height={100} />
+                                                  <Image src="/images/no-image.jpg" alt="Image not available" layout="fill" width={100} height={100} />
                                               </span>
                     }
                                       </span>

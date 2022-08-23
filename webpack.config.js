@@ -11,7 +11,8 @@ module.exports = {
         path: path.resolve(__dirname, 'dist/esm'),
         library: 'hollyburn-Lib',
         libraryTarget: "umd",
-        globalObject: 'this'
+        globalObject: 'this',
+        publicPath: ""
     },
     module: {
         rules: [
@@ -26,10 +27,10 @@ module.exports = {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", 'postcss-loader'],
             },
-            // {
-            //     test: /\.(png|svg|jpg|jpeg|gif)$/i,
-            //     type: 'asset/resource'
-            // }
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset/resource'
+            }
         ],
     },
     plugins: [

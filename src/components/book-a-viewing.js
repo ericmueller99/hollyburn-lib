@@ -22,6 +22,9 @@ import {
 import {PropertySelectWithOptGroup, FormErrors} from "./form-fields";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
+/**
+ * @param {string=} somebody - Somebody's name.
+ */
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
@@ -51,7 +54,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //get the vacancy feed.  this contains properties and all vacant units that we can use to populate the form.
     React.useEffect(() => {
 
-        if (!refreshFeed) {
+        if (!refreshFeed || isLoading) {
             return;
         }
 
