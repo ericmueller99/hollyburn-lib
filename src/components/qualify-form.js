@@ -336,7 +336,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                                       <input id={`pet_${p.value}`} name="petFriendly" type="radio" title="Pet Friendly" value={p.value} {...register('petFriendly', {required: true})} />
                                   </div>
                                   <div className="ml-3 text-sm">
-                                      <label htmlFor="pet_yes">{p.label}</label>
+                                      <label htmlFor={`pet_${p.value}`}>{p.label}</label>
                                   </div>
                               </div>
                             ))
