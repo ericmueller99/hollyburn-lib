@@ -213,7 +213,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             })
             .catch(error => {
                 setHasCriticalError(true);
-                setCriticalErrorMessage(error.response.data.errorMessage || "Unknown Error");
+                setCriticalErrorMessage(error?.response?.data?.errorMessage || "Unknown Error");
                 setIsLoading(false);
             })
     }
