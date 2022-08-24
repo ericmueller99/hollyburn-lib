@@ -23,6 +23,10 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
         {label: 4, value: 4},
         {label: 5, value: 5},
     ]
+    const petFriendlyOptions = [
+        {label: 'Yes', value: true},
+        {label: 'No', value: false}
+    ]
     const [cityOptions, setCityOptions] = React.useState([]);
     const [neighbourhoodOptions, setNeighbourhoodOptions] = React.useState([]);
     const [suiteTypeOptions, setSuiteTypeOptions] = React.useState([]);
@@ -321,23 +325,23 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
                 {/*Pet friendly*/}
                 <div className={textInputHolderClasses}>
-                    <label className={labelClasses}>
-                        Pet Friendly Required?
-                    </label>
-                    <div className={"mt-4"}>
-                        <div className="relative inline-flex items-start pr-4">
-                            <div className="flex items-center h-5">
-                                <input id={"pet-friendly"} name={'pet-friendly'} type="checkbox" title="Pet Friendly"
-                                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                       {...register("petFriendly")}
-                                />
-                            </div>
-                            <div className="ml-3 text-sm">
-                                <label htmlFor={"pet-friendly"} className={labelClasses}>
-                                    Yes
-                                </label>
-                            </div>
-                        </div>
+                    <div className="col-span-2">
+                        <label className={labelClasses}>*Pet Friendly Required?</label>
+                    </div>
+                    <div className="col-span-2">
+                        {
+                            petFriendlyOptions.map(p => (
+                              <div className="relative inline-flex items-start pr-4" key={p.value}>
+                                  <div className="flex items-center h-5">
+                                      <input id={`pet_${p.value}`} name="petFriendly" type="radio" title="Pet Friendly" value={p.value} {...register('petFriendly', {required: true})} />
+                                  </div>
+                                  <div className="ml-3 text-sm">
+                                      <label htmlFor="pet_yes">{p.label}</label>
+                                  </div>
+                              </div>
+                            ))
+                        }
+                        {errors.petFriendly && <p className="text-red-600">Please select pet friendly requirements.</p>}
                     </div>
                 </div>
 
@@ -355,7 +359,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 </div>
 
                 {/*City Interest*/}
-                <div className={"col-span-2 sm:col-auto"}>
+                <div className={"col-span-2"}>
                     <label className={labelClasses}>Interested Cities</label>
                 </div>
                 <div className={"col-span-2"}>
