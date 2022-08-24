@@ -202,8 +202,10 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             .then(res => {
                 console.log(res);
                 setIsLoading(false);
-                const {id} = res.data?.data;
-                data = {...data, formSubmissionId: id, result: true};
+                const {id} = res.data?.data || null;
+                if (id != null) {
+                    data = {...data, formSubmissionId: id, result: true};
+                }
                 if (stateSetter && typeof stateSetter === "function") {
                     stateSetter(data);
                 }
@@ -212,6 +214,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                 }
             })
             .catch(error => {
+                console.log(error);
                 setHasCriticalError(true);
                 setCriticalErrorMessage(error?.response?.data?.errorMessage || "Unknown Error");
                 setIsLoading(false);
