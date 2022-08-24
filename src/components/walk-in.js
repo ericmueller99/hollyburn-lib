@@ -135,7 +135,7 @@ export function WalkIn({propertyName, stateSetter, options = {}}) {
         <div className={"col-span-2 flex justify-end"}>
           {showBack && handleBackButton &&
             <>
-              <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
+              <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)}>Back</button>
               &nbsp;
             </>
           }
