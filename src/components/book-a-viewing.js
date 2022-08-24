@@ -2,7 +2,7 @@ import React  from 'react';
 import {useForm} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import {Transition} from '@headlessui/react'
-import {AvailableSuites} from "./form-fields";
+import {AvailableSuites, UpdatePreferenceBanner, VacancyDisplayType} from "./form-fields";
 
 import moment from "moment";
 import {
@@ -22,16 +22,16 @@ import {
 import {PropertySelectWithOptGroup, FormErrors} from "./form-fields";
 
 //this form is generally part of a wizard, so instead of submission directly it is given a function that will update state that the wizard is watching
-/**
- * @param {string=} somebody - Somebody's name.
- */
 export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     const {buttonText = 'Submit', showBack, handleBackButton, preferences: formPrefs = {},
         showUpdatePrefsBanner, handleUpdatePrefs, formHolderClasses = formHolderTailwindClasses(), formClasses = formTailwindClasses(),
         buttonClasses = buttonTailwindClasses(), hbOrangeButton = hbOrangeButtonClasses(), availableSuiteHolderClasses = availableSuiteHolderTailwindClasses(),
-        textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses()
+        textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(), updatePrefsIconHolderClasses
     } = options;
+    const updatePrefsOptions = {
+        iconHolderClasses: updatePrefsIconHolderClasses
+    }
     const [refreshFeed, setRefreshFeed] = React.useState(true);
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
@@ -373,48 +373,11 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
 
                 {/*Display type.  Filtered on preferences or shows all vacancies*/}
-                <div className={"col-span-2 sm:col-span-1"}>
-                    <fieldset>
-                        <label htmlFor={"vacancy-display-type"} className={"block text-sm font-medium text-hbGray mb-3"}>Filter based on preferences?</label>
-                    </fieldset>
-                    <div className={"relative inline-flex items-start pr-4"}>
-                        <div className={"flex items-center h-5"}>
-                            <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
-                                   value={'yes'} {...register("vacancyDisplayType")} />
-                        </div>
-                        <div className={"ml-3 text-sm"}>
-                            <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>Yes</label>
-                        </div>
-                    </div>
-                    <div className={"relative inline-flex items-start pr-4"}>
-                        <div className={"flex items-center h-5"}>
-                            <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
-                                   value={'no'} {...register("vacancyDisplayType")} />
-                        </div>
-                        <div className={"ml-3 text-sm"}>
-                            <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>No</label>
-                        </div>
-                    </div>
-                </div>
+                <VacancyDisplayType register={register} />
 
                 {/*update preferences banner*/}
                 {showUpdatePrefsBanner && vacancyDisplayTypeWatch === 'yes' && handleUpdatePrefs && typeof handleUpdatePrefs === 'function' && propertyOptions.length > 0 &&
-                    <div className={"col-span-2"}>
-                        <div className="rounded-md bg-white p-4 border border-gray-300">
-                            <div className="flex">
-                                <div className="hidden md:flex-shrink-0 md:items-center md:flex lg:hidden">
-                                    <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
-                                </div>
-                                <div className="flex-1 flex justify-between items-center space-y-2">
-                                    <p className="flex items-center ml-1">Not seeing what you need?</p>
-                                    <p className="flex items-center">
-                                        <button type="button" className={"w-full inline-flex items-center justify-center px-6 py-1 border border-transparent rounded-md shadow-sm text-base " +
-                                            "text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"} onClick={event => handleUpdatePrefs(event)}>Update Preferences</button>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <UpdatePreferenceBanner handleUpdatePrefs={handleUpdatePrefs} options={updatePrefsOptions} />
                 }
 
                 {/*Step 1 - Select a Property*/}

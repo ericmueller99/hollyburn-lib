@@ -47,6 +47,10 @@ export const buttonTailwindClasses = () => {
     return 'mt-2 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto'
 }
 
+export const slimButtonTailwindClasses = () => {
+    return 'w-full inline-flex items-center justify-center px-6 py-1 border border-transparent rounded-md shadow-sm text-base text-white bg-hbBlue hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto';
+}
+
 export const hbOrangeButtonClasses = () => {
     return 'cursor-pointer bg-hbOrange hover:bg-hbOrangeHover mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium';
 }
@@ -85,7 +89,6 @@ export const propertyOptGroupBuilder = (propertyOptions) => {
         else {
             options.forEach(o => {
                 if (o.optGroup === p.optGroup) {
-                    console.log(p.optGroup);
                     o.data.push(p);
                 }
             })
@@ -96,7 +99,6 @@ export const propertyOptGroupBuilder = (propertyOptions) => {
 
 //filter properties for book a viewing
 export const filterProperties = (vacancyFeed) => {
-    console.log(vacancyFeed);
     return vacancyFeed.filter(p => {
         if (!p.hasVacancy) {
             return false;
@@ -107,7 +109,8 @@ export const filterProperties = (vacancyFeed) => {
         return {
             label: p.propertyName,
             value: p.propertyHMY,
-            optGroup: p.city
+            optGroup: p.city,
+            propertyCode: p.propertyCode
         }
     });
 }

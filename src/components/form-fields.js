@@ -1,8 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import noImage from "../../public/images/no-image.jpg";
-import {formatDateMMMD, suiteTypeMapper} from "../lib/helpers";
-import {XCircleIcon} from "@heroicons/react/solid";
+import {formatDateMMMD, slimButtonTailwindClasses, suiteTypeMapper} from "../lib/helpers";
+import {InformationCircleIcon, XCircleIcon} from "@heroicons/react/solid";
 
 export const PropertySelectWithOptGroup = ({register, propertyOptions, tailwindClasses}) => {
   return (
@@ -97,6 +96,81 @@ export const AvailableSuites = ({register, suiteOptions, suiteWatch, availableSu
   )
 }
 
+export const InvalidVacancyOrPropertyLink = ({text, handleDismissClick, options = {}}) => {
+
+  const {iconHolderClasses = 'hidden md:flex-shrink-0 md:items-center md:flex', buttonClasses = slimButtonTailwindClasses()} = options;
+
+  return (
+    <div className={"col-span-2"}>
+      <div className="rounded-md bg-white p-4 border border-red-700">
+        <div className="flex">
+          <div className={iconHolderClasses}>
+            <InformationCircleIcon className="h-5 w-5 text-red-700" aria-hidden="true" />
+          </div>
+          <div className="flex-1 flex justify-between items-center space-y-2">
+            <p className="flex items-center ml-1">{text}</p>
+            <button type="button" className={buttonClasses} onClick={event => handleDismissClick(event)}>Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const UpdatePreferenceBanner = ({handleUpdatePrefs, options = {}}) => {
+
+  const {iconHolderClasses = 'hidden md:flex-shrink-0 md:items-center md:flex', buttonClasses = slimButtonTailwindClasses()} = options;
+
+  return (
+    <div className={"col-span-2"}>
+      <div className="rounded-md bg-white p-4 border border-gray-300">
+        <div className="flex">
+          <div className={iconHolderClasses}>
+            <InformationCircleIcon className="h-5 w-5 text-hbBlue" aria-hidden="true" />
+          </div>
+          <div className="flex-1 flex justify-between items-center space-y-2">
+            <p className="flex items-center ml-1">Not seeing what you need?</p>
+            <p className="flex items-center">
+              <button type="button" className={buttonClasses} onClick={event => handleUpdatePrefs(event)}>
+                Update Preferences
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+//radio button for whether preferences should be used
+export const VacancyDisplayType = ({register}) => {
+  return (
+    <div className={"col-span-2 sm:col-span-1"}>
+      <fieldset>
+        <label htmlFor={"vacancy-display-type"} className={"block text-sm font-medium text-hbGray mb-3"}>Filter based on preferences?</label>
+      </fieldset>
+      <div className={"relative inline-flex items-start pr-4"}>
+        <div className={"flex items-center h-5"}>
+          <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                 value={'yes'} {...register("vacancyDisplayType")} />
+        </div>
+        <div className={"ml-3 text-sm"}>
+          <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>Yes</label>
+        </div>
+      </div>
+      <div className={"relative inline-flex items-start pr-4"}>
+        <div className={"flex items-center h-5"}>
+          <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+                 value={'no'} {...register("vacancyDisplayType")} />
+        </div>
+        <div className={"ml-3 text-sm"}>
+          <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>No</label>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 //form errors control.  Displays all errors on a form.
 export const FormErrors = ({errors}) => {
 
@@ -113,7 +187,7 @@ export const FormErrors = ({errors}) => {
           </div>
           {
             Object.keys(errors).map(key => (
-              <div className="ml-3 flex-1 md:flex md:justify-between text-center">
+              <div className="ml-3 flex-1 md:flex md:justify-between text-center" key={key}>
                 <p className={"text-white"}>{errors[key].message}</p>
               </div>
             ))
