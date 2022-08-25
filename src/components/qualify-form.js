@@ -38,6 +38,8 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     } = options;
 
+    console.log(petFriendly);
+
     //get city options
     React.useEffect(() => {
 
@@ -113,7 +115,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
 
     const {control, register, handleSubmit, formState: {errors}, setError, setValue, getValues} = useForm({
         defaultValues: {
-            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, petFriendly
+            firstName, lastName, emailAddress, phoneNumber, maxBudget, moveIn, suiteTypes, cities, neighbourhoods, numberOfOccupants, petFriendly: petFriendly ? 'true' : 'false'
         }
     });
     const [isLoading, setIsLoading] = React.useState(false);

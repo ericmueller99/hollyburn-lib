@@ -38,7 +38,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     const [isLoading, setIsLoading] = React.useState(false);
     const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm({
         defaultValues: {
-            vacancyDisplayType: 'yes'
+            vacancyDisplayType: vacancyId ? 'no' : 'yes'
         }
     })
     const [suiteOptions, setSuiteOptions] = React.useState([]);
