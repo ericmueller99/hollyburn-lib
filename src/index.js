@@ -6,12 +6,12 @@ import {Footer} from "./components/footer";
 import {Fonts} from "./components/fonts";
 import {BasicForm} from "./components/basic-form";
 import {BookAViewing} from "./components/book-a-viewing";
-import {LoadingWidget} from "./components/utils";
+import {LoadingWidget, ErrorMessage} from "./components/utils";
 import {buttonTailwindClasses} from "./lib/helpers";
 import {WalkIn} from "./components/walk-in";
 import {NeedAssistance} from "./components/need-assistance";
 
 export {
     QualifyForm, Header, ThankYou, Footer, Fonts, BasicForm, BookAViewing, LoadingWidget, buttonTailwindClasses,
-    WalkIn, NeedAssistance
+    WalkIn, NeedAssistance, ErrorMessage
 }
