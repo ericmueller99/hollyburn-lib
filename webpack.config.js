@@ -2,6 +2,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const path = require("path");
+const MomentTimezoneDataPlugin = require("moment-timezone-data-webpack-plugin");
 
 module.exports = {
     mode: 'production',
@@ -38,6 +39,9 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'index.css'
         }),
+        new MomentTimezoneDataPlugin({
+            matchCountries: 'CA'
+        })
     ],
     externals: [nodeExternals()],
     resolve: {

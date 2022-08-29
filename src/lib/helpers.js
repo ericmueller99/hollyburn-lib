@@ -5,6 +5,7 @@ export const formatDate = (date) => {
     let month = (d.getMonth() + 1).toString();
     let day = d.getDate().toString();
     let year = d.getFullYear();
+    let timezone = d.getTimezoneOffset();
     if (month.length < 2) {
         month = '0' + month;
     }

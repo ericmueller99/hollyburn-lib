@@ -5,6 +5,9 @@ import {Transition} from '@headlessui/react'
 import {AvailableSuites, UpdatePreferenceBanner, VacancyDisplayType} from "./form-fields";
 
 import moment from "moment";
+const momentTz = require('moment-timezone');
+
+
 import {
     buttonTailwindClasses,
     formatDate,
@@ -191,10 +194,13 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         const availabilityEnd = new Date(currentDate.getTime() + (oneDayInMillis*5));
         const numberOfSuites = suiteWatchCleaned.size;
         const url = `https://api.hollyburn.com/properties/property/${property.propertyHMY}/availability/?startDate=${formatDateWithTime(availabilityStart)}&endDate=${formatDateWithTime(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
+        // const url = `http://localhost:3001/properties/property/${property.propertyHMY}/availability/?startDate=${formatDateWithTime(availabilityStart)}&endDate=${formatDateWithTime(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
+
 
         fetch(url)
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setIsLoading(false);
                 const dayInterval = new Date(availabilityStart);
                 const availabilityByDay = [];
@@ -235,13 +241,16 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //finding the timeslots that match the selected day.
         const [{timeSlots}] = dayOptions.filter(d => d.value === dayWatch);
+        console.log(timeSlots);
         if (timeSlots) {
             const timeSlotOptions = timeSlots.map((t, index) => {
+                console.log(t.timezone);
                 return {
-                    start: moment(t.start).format('h:mm A'),
-                    end: moment(t.end).format('h:mm A'),
+                    // start: moment(t.start).format('h:mm A'),
+                    start: momentTz.tz(t.start, t.timezone).format('h:mm A'),
+                    end:  momentTz.tz(t.end, t.timezone).format('h:mm A'),
                     key: index,
-                    value: `${moment(t.start).format('YYYY-MM-DDTHH:mm:ss')}to${moment(t.end).format('YYYY-MM-DDTHH:mm:ss')}`,
+                    value: `${momentTz.tz(t.start, t.timezone).format('YYYY-MM-DDTHH:mm:ss')}to${momentTz.tz(t.end, t.timezone).format('YYYY-MM-DDTHH:mm:ss')}`,
                 }
             })
             setTimeOptions(timeSlotOptions)
