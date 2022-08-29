@@ -17,7 +17,7 @@ import {
     filterProperties,
     filterPropertiesWithPrefs,
     getVacancyFeed,
-    availableSuiteHolderTailwindClasses, filterVacanciesFromProperty, getVacanciesFromIds
+    availableSuiteHolderTailwindClasses, filterVacanciesFromProperty, getVacanciesFromIds, formatDateWithTime
 } from "../lib/helpers";
 import {PropertySelectWithOptGroup, FormErrors} from "./form-fields";
 
@@ -184,15 +184,17 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         //format the startDate and endDate time
         const currentDate = new Date();
         const oneDayInMillis = 100800000; //28 hours to give a bit of a buffer for notices etc...
-        const availabilityStart = new Date(currentDate.getTime() + oneDayInMillis);
+        let availabilityStart = new Date(currentDate.getTime() + oneDayInMillis);
+        //rounding the start date to the nearest 30 minutes
+        availabilityStart = new Date(Math.round(availabilityStart.getTime() / (1000 * 60 * 30)) * (1000 * 60 * 30));
+
         const availabilityEnd = new Date(currentDate.getTime() + (oneDayInMillis*5));
         const numberOfSuites = suiteWatchCleaned.size;
-        const url = `https://api.hollyburn.com/properties/property/${property.propertyHMY}/availability/?startDate=${formatDate(availabilityStart)}&endDate=${formatDate(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
+        const url = `https://api.hollyburn.com/properties/property/${property.propertyHMY}/availability/?startDate=${formatDateWithTime(availabilityStart)}&endDate=${formatDateWithTime(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
 
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setIsLoading(false);
                 const dayInterval = new Date(availabilityStart);
                 const availabilityByDay = [];
@@ -233,7 +235,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //finding the timeslots that match the selected day.
         const [{timeSlots}] = dayOptions.filter(d => d.value === dayWatch);
-        console.log(timeSlots);
         if (timeSlots) {
             const timeSlotOptions = timeSlots.map((t, index) => {
                 return {
@@ -305,8 +306,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         if (!dayWatch || dayOptions.length === 0) {
             return '';
         }
-
-        console.log(timeOptions);
 
         return (
             <div className={`col-span-2`}>

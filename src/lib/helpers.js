@@ -14,6 +14,10 @@ export const formatDate = (date) => {
     return [year, month, day].join('-');
 }
 
+export const formatDateWithTime = (date) => {
+    return moment(date).format('YYYY-MM-DDTHH:mm');
+}
+
 export const formatDateMMMD = (date) => {
     const d = moment(date);
     return d.format('MMM D');
