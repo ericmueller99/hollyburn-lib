@@ -134,8 +134,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         }
 
         //getting vacancies and setting the suite options from them.
-        const vacancies = filterVacanciesFromProperty(vacancyFeed, propertyWatch, preferences);
-        setSuiteOptions(vacancies);
+        if (vacancyDisplayTypeWatch === 'yes') {
+            const vacancies = filterVacanciesFromProperty(vacancyFeed, propertyWatch, preferences);
+            setSuiteOptions(vacancies);
+        }
+        else {
+            const vacancies = filterVacanciesFromProperty(vacancyFeed, propertyWatch);
+            setSuiteOptions(vacancies);
+        }
 
         //resetting fields
         resetField('suites');
@@ -186,6 +192,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         fetch(url)
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setIsLoading(false);
                 const dayInterval = new Date(availabilityStart);
                 const availabilityByDay = [];
@@ -226,6 +233,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //finding the timeslots that match the selected day.
         const [{timeSlots}] = dayOptions.filter(d => d.value === dayWatch);
+        console.log(timeSlots);
         if (timeSlots) {
             const timeSlotOptions = timeSlots.map((t, index) => {
                 return {
@@ -298,11 +306,14 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             return '';
         }
 
+        console.log(timeOptions);
+
         return (
             <div className={`col-span-2`}>
                 <fieldset>
                     <p>
-                        Choose an available timeslot.
+                        Choose an available timeslot. <br/>
+                        <span className="text-xs">(all times are in the local timezone of the property)</span>
                     </p>
                     <div className={"mt-4 gap-x-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4"}>
                         {
