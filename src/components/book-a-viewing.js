@@ -182,7 +182,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         }
 
         //resetting fields
-        resetField('suites');
+        setValue('suites', []); //resetting this way because resetField is not working for this.
         resetField('date');
         resetField('timeslot');
 
@@ -217,7 +217,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         setIsLoading(true);
         resetField('timeslot');
-        // resetField('date');
+        resetField('date');
 
         //format the startDate and endDate time
         const currentDate = new Date();
@@ -291,6 +291,9 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
     //days and time slots available based on the property & unit(s) selected.
     function AvailableDays() {
+
+        console.log(suiteWatch)
+        console.log(getValues('suites'));
 
         if (!suiteWatch || suiteWatch.length === 0 || !suiteOptions || suiteOptions.length === 0) {
             return '';
