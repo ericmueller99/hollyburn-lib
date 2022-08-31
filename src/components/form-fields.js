@@ -160,11 +160,11 @@ export const VacancyDisplayType = ({register}) => {
       </div>
       <div className={"relative inline-flex items-start pr-4"}>
         <div className={"flex items-center h-5"}>
-          <input id={'vacancy-display-yes'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
+          <input id={'vacancy-display-no'} type={"radio"} className={"focus:ring-hbBlue h-4 w-4 text-hbBlue border-gray-300 rounded"}
                  value={'no'} {...register("vacancyDisplayType")} />
         </div>
         <div className={"ml-3 text-sm"}>
-          <label htmlFor={'vacancy-display-yes'} className={"font-medium text-gray-700"}>No</label>
+          <label htmlFor={'vacancy-display-no'} className={"font-medium text-gray-700"}>No</label>
         </div>
       </div>
     </div>

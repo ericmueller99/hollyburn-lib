@@ -1,13 +1,9 @@
 import React  from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, useWatch} from 'react-hook-form';
 import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
 import {Transition} from '@headlessui/react'
 import {AvailableSuites, UpdatePreferenceBanner, VacancyDisplayType} from "./form-fields";
-
-import moment from "moment";
 const momentTz = require('moment-timezone');
-
-
 import {
     buttonTailwindClasses,
     formatDate,
@@ -39,13 +35,17 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     const [vacancyFeed, setVacancyFeed] = React.useState([]);
     const [propertyOptions, setPropertyOptions] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(false);
-    const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, resetField} = useForm({
+    const {control, watch, register, handleSubmit, formState: {errors}, setError, setValue, getValues, resetField} = useForm({
         defaultValues: {
-            vacancyDisplayType: vacancyId ? 'no' : 'yes'
+            vacancyDisplayType: vacancyId ? 'no' : 'yes',
+            suites: vacancyId ? [vacancyId] : []
         }
     })
     const [suiteOptions, setSuiteOptions] = React.useState([]);
-    const suiteWatch = watch('suites');
+    const suiteWatch = useWatch({
+        control,
+        name: 'suites'
+    })
     const [dayOptions, setDayOptions] = React.useState([]);
     const dayWatch = watch('date');
     const propertyWatch = watch('property');
@@ -53,6 +53,18 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     const timeWatch = watch('timeslot');
     const [preferences, setPreferences] = React.useState(formPrefs)
     const vacancyDisplayTypeWatch = watch('vacancyDisplayType');
+    const [preferenceWarning, setPreferenceWarning] = React.useState({showWarning: false});
+
+    const dismissPreferenceWarning = (event) => {
+        if (event && event.preventDefault()) {
+            event.preventDefault();
+        }
+        setPreferenceWarning({
+            ...preferenceWarning,
+            showWarning: false,
+            dismissed: true
+        })
+    }
 
     //get the vacancy feed.  this contains properties and all vacant units that we can use to populate the form.
     React.useEffect(() => {
@@ -81,6 +93,10 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //the vacancy feed data has been refreshed.
     React.useEffect(() => {
 
+        resetField('suites');
+        resetField('date');
+        resetField('timeslot');
+
         //if there are preferences and the vacancyDisplayWatch === 'yes' then applying those preferences
         if (preferences && vacancyDisplayTypeWatch === 'yes') {
             const properties = filterPropertiesWithPrefs(vacancyFeed, preferences);
@@ -92,7 +108,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         }
 
         //if there is a vacancy Id then prefill the form.
-        if (vacancyId) {
+        if (vacancyId && vacancyDisplayTypeWatch === 'no') {
             try {
                 if (parseInt(vacancyId)) {
                     //trying to find the vacancy
@@ -107,9 +123,22 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                             }
                         }
                     })
+
+                    //getting the properties filtered by preference so we can see if the preference matches the property selected on hollyburn.com
+                    if (preferences && property) {
+                        const preferenceProperties = filterPropertiesWithPrefs(vacancyFeed, preferences);
+                        const linkedFromPreferences = preferenceProperties.filter(p => p.value === property.propertyHMY);
+                        if (linkedFromPreferences.length === 0 && !preferenceWarning.dismissed) {
+                            setPreferenceWarning({
+                                ...preferenceWarning,
+                                showWarning: true,
+                                preferenceProperties
+                            });
+                        }
+                    }
+
                     if (property && vacancy) {
                         setValue('property', property.propertyHMY)
-                        setValue('suites', [vacancy.vacancyId]);
                     }
                 }
             }
@@ -117,6 +146,12 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 console.log('unable to load from vacancyId');
                 console.log(e);
             }
+        }
+        else {
+            setPreferenceWarning({
+                ...preferenceWarning,
+                showWarning: false
+            })
         }
 
         if (!vacancyId) {
@@ -182,7 +217,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         setIsLoading(true);
         resetField('timeslot');
-        resetField('date');
+        // resetField('date');
 
         //format the startDate and endDate time
         const currentDate = new Date();
@@ -196,11 +231,9 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
         const url = `https://api.hollyburn.com/properties/property/${property.propertyHMY}/availability/?startDate=${formatDateWithTime(availabilityStart)}&endDate=${formatDateWithTime(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
         // const url = `http://localhost:3001/properties/property/${property.propertyHMY}/availability/?startDate=${formatDateWithTime(availabilityStart)}&endDate=${formatDateWithTime(availabilityEnd)}&numberOfSuites=${numberOfSuites}`;
 
-
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setIsLoading(false);
                 const dayInterval = new Date(availabilityStart);
                 const availabilityByDay = [];
@@ -241,10 +274,8 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
 
         //finding the timeslots that match the selected day.
         const [{timeSlots}] = dayOptions.filter(d => d.value === dayWatch);
-        console.log(timeSlots);
         if (timeSlots) {
             const timeSlotOptions = timeSlots.map((t, index) => {
-                console.log(t.timezone);
                 return {
                     // start: moment(t.start).format('h:mm A'),
                     start: momentTz.tz(t.start, t.timezone).format('h:mm A'),
@@ -348,6 +379,8 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //form submission
     const onSubmit = (data) => {
 
+        console.log(data);
+
         //making sure property is not 'Please Select...'
         const {property, suites, timeslot} = data;
         if (property === 'Please Select...') {
@@ -390,6 +423,28 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
             </div>
 
             <form className={formClasses} onSubmit={handleSubmit(onSubmit)}>
+
+                <Transition
+                  show={preferenceWarning.showWarning}
+                  enter="col-span-2 transition ease duration-700 transform"
+                  enterFrom="opacity-0 -translate-y-full"
+                  enterTo="opacity-100 translate-y-0"
+                  entered="col-span-2"
+                  leave="col-span-2 transition ease duration-1000 transform"
+                  leaveFrom="opacity-100 translate-y-0"
+                  leaveTo="opacity-0 -translate-y-full"
+                >
+                    <div className={"col-span-2"}>
+                        <div className="rounded-md bg-white p-4 border border-red-700">
+                            <div className="flex">
+                                <div className="flex-1 flex justify-between items-center space-y-2">
+                                    <p className="flex items-center ml-1">The suite you choose on Hollyburn.com does not match your saved preferences.  Please confirm the suite details before booking.</p>
+                                    <button type="button" className={buttonClasses} onClick={event => dismissPreferenceWarning(event)}>Dismiss</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Transition>
 
                 {/*Display type.  Filtered on preferences or shows all vacancies*/}
                 <VacancyDisplayType register={register} />

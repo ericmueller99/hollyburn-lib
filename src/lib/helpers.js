@@ -223,8 +223,7 @@ export const getVacanciesFromIds = (vacancyFeed, vacancyIds) => {
     const vacancies = [];
     vacancyFeed.filter(p=>p.hasVacancy).map(p => {
         for (const v of p.vacancies) {
-            if (vacancyIds.includes(v.vacancyId)) {
-                console.log('matched');
+            if (vacancyIds.includes(String(v.vacancyId))) {
                 vacancies.push(v);
             }
         }
