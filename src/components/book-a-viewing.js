@@ -282,7 +282,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                     end:  momentTz.tz(t.end, t.timezone).format('h:mm A'),
                     key: index,
                     // value: `${momentTz.tz(t.start, t.timezone).format('YYYY-MM-DDTHH:mm:ss')}to${momentTz.tz(t.end, t.timezone).format('YYYY-MM-DDTHH:mm:ss')}`,
-                    value: `${momentTz.tz(t.start, t.timezone)}to${momentTz.tz(t.end, t.timezone)}`,
+                    value: `${momentTz.tz(t.start, t.timezone).format()}to${momentTz.tz(t.end, t.timezone).format()}`,
                 }
             })
             setTimeOptions(timeSlotOptions)
