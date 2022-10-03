@@ -187,6 +187,8 @@ export const getVacancyFeed = () => {
 //return vacancies that match the property from the vacancy feed
 export const filterVacanciesFromProperty = (vacancyFeed, propertyHMY, preferences = null) => {
 
+    console.log(vacancyFeed);
+
     //getting vacancies for property and filtering out furnished rentals
     const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyHMY));
     if (!selectedProperty) {

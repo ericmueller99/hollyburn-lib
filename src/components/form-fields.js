@@ -26,7 +26,7 @@ export const PropertySelectWithOptGroup = ({register, propertyOptions, tailwindC
 
 export const AvailableSuites = ({register, suiteOptions, suiteWatch, availableSuiteHolderClasses, hbOrangeButton, options = {}}) => {
 
-  const {headerText = 'Choose suites that match your preference.', infoText = '(Up to a maximum of 3 suites)'} = options;
+  const {headerText = 'Choose suites that match your preference.', infoText = '(Up to a maximum of 3 suites)', useNoSelfBookingFlag = false} = options;
 
   //if there are no suite options then return early
   if (!suiteOptions || suiteOptions.length === 0) {
@@ -80,9 +80,18 @@ export const AvailableSuites = ({register, suiteOptions, suiteWatch, availableSu
                                                 <span className={"block text-xl font-medium text-hbGray"}>${s.askingRent} monthly</span>
                                                 <span className={"block text-xs text-gray-900"}>{s.features && s.features.length > 0 ? `${s.features.toString().replace(/,/g, ', ')},` : ''} {s.flooring}, {s.countertops}</span>
                                                 <span className="block justify-end">
+                                                  {
+                                                    useNoSelfBookingFlag === true && s.noSelfBookings === true &&
+                                                    <p className="text-xs font-medium text-gray-900">Unavailable for self-booking.  Please call a rental advisor to book a viewing.</p>
+
+                                                  }
+                                                  {
+                                                    !s.noSelfBookings &&
                                                     <label htmlFor={`${s.vacancyId}-suite`} className={hbOrangeButton}>
-                                                        {suiteWatchCleaned.includes(s.vacancyId) ? 'Selected' : 'Select'}
+                                                      {suiteWatchCleaned.includes(s.vacancyId) ? 'Selected' : 'Select'}
                                                     </label>
+                                                  }
+
                                                 </span>
                                             </span>
                                         </span>

@@ -500,7 +500,7 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 }
 
                 {/*Step 2 - Choose Available Suites*/}
-                <AvailableSuites availableSuiteHolderClasses={availableSuiteHolderClasses} suiteWatch={suiteWatch} suiteOptions={suiteOptions} register={register} hbOrangeButton={hbOrangeButton} />
+                <AvailableSuites availableSuiteHolderClasses={availableSuiteHolderClasses} suiteWatch={suiteWatch} suiteOptions={suiteOptions} register={register} hbOrangeButton={hbOrangeButton} options={{useNoSelfBookingFlag: true}} />
 
                 {/*Step 3 - Choose date */}
                 <AvailableDays control={control} />
