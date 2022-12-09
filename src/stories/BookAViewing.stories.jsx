@@ -101,3 +101,13 @@ export const WithVacancyId = Template.bind({})
 WithVacancyId.args = {
     vacancyId: '79984'
 }
+
+export const petFriendlyNorthVan = Template.bind({})
+petFriendlyNorthVan.args = {
+    options: {
+        preferences: {
+            petFriendly: true,
+            cities: ['North Vancouver']
+        }
+    }
+}

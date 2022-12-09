@@ -132,6 +132,9 @@ export const filterPropertiesWithPrefs = (vacancyFeed, preferences) => {
             }
         }
         const matchedVacancies = p.vacancies.filter(v => {
+            if (p?.unitDefinedPetFriendly === true && !v.petFriendly) {
+                return false;
+            }
             if (v.furnishedRental) {
                 return false;
             }
@@ -187,13 +190,13 @@ export const getVacancyFeed = () => {
 //return vacancies that match the property from the vacancy feed
 export const filterVacanciesFromProperty = (vacancyFeed, propertyHMY, preferences = null) => {
 
-    console.log(vacancyFeed);
-
     //getting vacancies for property and filtering out furnished rentals
     const [selectedProperty] = vacancyFeed.filter(p => p.propertyHMY === parseInt(propertyHMY));
     if (!selectedProperty) {
         return [];
     }
+
+    const unitPetFriendlyFilter = selectedProperty?.unitDefinedPetFriendly === true
 
     let {vacancies} = selectedProperty || [];
     vacancies = vacancies.filter(v => !v.furnishedRental);
@@ -210,6 +213,9 @@ export const filterVacanciesFromProperty = (vacancyFeed, propertyHMY, preference
                 if (!preferences.suiteTypes.map(s => Number(s)).includes(parseInt(v.bedrooms))) {
                     return false;
                 }
+            }
+            if (unitPetFriendlyFilter && !v.petFriendly) {
+                return false;
             }
             return true;
         });

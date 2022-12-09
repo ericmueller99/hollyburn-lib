@@ -293,9 +293,6 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
     //days and time slots available based on the property & unit(s) selected.
     function AvailableDays() {
 
-        console.log(suiteWatch)
-        console.log(getValues('suites'));
-
         if (!suiteWatch || suiteWatch.length === 0 || !suiteOptions || suiteOptions.length === 0) {
             return '';
         }
@@ -500,6 +497,9 @@ export function BookAViewing({vacancyId, stateSetter, options = {}}) {
                 }
 
                 {/*Step 2 - Choose Available Suites*/}
+                {
+                    console.log(propertyWatch)
+                }
                 <AvailableSuites availableSuiteHolderClasses={availableSuiteHolderClasses} suiteWatch={suiteWatch} suiteOptions={suiteOptions} register={register} hbOrangeButton={hbOrangeButton} options={{useNoSelfBookingFlag: true}} />
 
                 {/*Step 3 - Choose date */}
