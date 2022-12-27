@@ -34,7 +34,7 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton,
         formClasses = formTailwindClasses(), textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(),
         formHolderClasses = formHolderTailwindClasses(), textInputHolderClasses = txtInputHolderTailwindClasses(), checkboxClasses = checkboxTailwindClasses(),
-        buttonClasses = buttonTailwindClasses()
+        buttonClasses = buttonTailwindClasses(), showCancel = false, handleCancelButton, cancelButtonTailwindClasses = buttonTailwindClasses()
 
     } = options;
 
@@ -408,6 +408,10 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
                     {showBack && handleBackButton &&
                         <button type="button" className={`${buttonClasses} mr-1`} onClick={event => handleBackButton(event)} >Back</button>
 
+                    }
+                    {
+                        showCancel && handleCancelButton &&
+                        <button type="button" className={`${cancelButtonTailwindClasses} mr-1`} onClick={event => handleCancelButton(event)}>Cancel</button>
                     }
                     <button type={"submit"} className={buttonClasses}>
                         {buttonText}
