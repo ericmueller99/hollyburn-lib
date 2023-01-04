@@ -1,6 +1,6 @@
 import React  from 'react';
 import {useForm, useWatch} from 'react-hook-form';
-import {CheckCircleIcon, XCircleIcon, InformationCircleIcon} from "@heroicons/react/solid";
+import {CheckCircleIcon, InformationCircleIcon} from "@heroicons/react/24/solid";
 import {Transition} from '@headlessui/react'
 import {AvailableSuites, UpdatePreferenceBanner, VacancyDisplayType} from "./form-fields";
 const momentTz = require('moment-timezone');

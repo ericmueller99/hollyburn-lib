@@ -1,5 +1,5 @@
 import React from 'react';
-import {XCircleIcon} from "@heroicons/react/solid";
+import {XCircleIcon} from "@heroicons/react/24/solid";
 
 export function LoadingWidget({isLoading = false}) {
     return (

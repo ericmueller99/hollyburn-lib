@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import {formatDateMMMD, slimButtonTailwindClasses, suiteTypeMapper} from "../lib/helpers";
-import {InformationCircleIcon, XCircleIcon} from "@heroicons/react/solid";
+import {InformationCircleIcon, XCircleIcon} from "@heroicons/react/24/solid";
 
 export const PropertySelectWithOptGroup = ({register, propertyOptions, tailwindClasses}) => {
     return (<select className={tailwindClasses} {...register('property', {required: "Please select a property."})}

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Disclosure, Menu, Transition} from "@headlessui/react";
 import Image from "next/image";
-import { MenuIcon, XIcon } from '@heroicons/react/outline'
+import { MenuIcon, XIcon } from '@heroicons/react/24/outline'
 
 //TODO update this to pull from a CMS / Database instead.
 const menuItems = [

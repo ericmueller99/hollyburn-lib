@@ -5,7 +5,7 @@ import Image from "next/image";
 import {useForm, Controller, useWatch} from 'react-hook-form';
 import moment from 'moment';
 import axios from "axios";
-import {XCircleIcon} from "@heroicons/react/solid";
+import {XCircleIcon} from "@heroicons/react/24/solid";
 
 import {
     buttonTailwindClasses,
