@@ -11,9 +11,6 @@
   },
   "author": "Eric Mueller",
   "license": "ISC",
-  "dependancies": {
-    "@heroicons/react": "^1.0.6"
-  },
   "devDependencies": {
     "@babel/core": "^7.18.9",
     "@babel/preset-env": "^7.18.9",
@@ -64,6 +61,7 @@
     "webpack": "^5"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.6",
     "fs": "^0.0.1-security",
     "mmmagic-type": "^1.0.0",
     "moment-timezone": "^0.5.37",
