@@ -58,7 +58,6 @@
     "moment": "^2.29.4",
     "react-datepicker": "^4.8.0",
     "react-hook-form": "^7.33.1",
-    "@heroicons/react": "^1.0.6"
   },
   "resolutions": {
     "webpack": "^5"
