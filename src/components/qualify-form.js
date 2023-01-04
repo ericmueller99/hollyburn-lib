@@ -34,11 +34,9 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
     const {buttonText = 'Submit', submitUrl = '/api/submit', showBack, handleBackButton,
         formClasses = formTailwindClasses(), textInputClasses = txtInputTailwindClasses(), labelClasses = labelTailwindClasses(),
         formHolderClasses = formHolderTailwindClasses(), textInputHolderClasses = txtInputHolderTailwindClasses(), checkboxClasses = checkboxTailwindClasses(),
-        buttonClasses = buttonTailwindClasses(), showCancel = false, handleCancelButton, cancelButtonTailwindClasses = buttonTailwindClasses()
+        buttonClasses = buttonTailwindClasses(), showCancel = false, handleCancelButton, cancelButtonTailwindClasses = buttonTailwindClasses(), additionalSubmitData = {}, readSubmitResult = true
 
     } = options;
-
-    console.log(petFriendly);
 
     //get city options
     React.useEffect(() => {
@@ -197,23 +195,33 @@ export function QualifyForm ({firstName, lastName, emailAddress, phoneNumber, ma
             return;
         }
 
+        //add any additionalSubmitData to the request that may have been included.
+        data = {...additionalSubmitData, ...data};
+
         //send the request to the api endpoint
         setHasCriticalError(false);
         setIsLoading(true);
         axios.post(submitUrl, data)
             .then(res => {
-                console.log(res);
+
                 setIsLoading(false);
-                const {id} = res.data?.data || null;
-                if (id != null) {
-                    data = {...data, formSubmissionId: id, result: true};
+
+                //if readSubmitResult === true then try to parse out a Salesforce id as that is the default return.
+                if (readSubmitResult) {
+                    const {id} = res.data?.data || null;
+                    if (id != null) {
+                        data = {...data, formSubmissionId: id, result: true};
+                    }
                 }
+
+                //if a stateSetter function is present then set the state.
                 if (stateSetter && typeof stateSetter === "function") {
                     stateSetter(data);
                 }
                 else {
                     console.log('unable to update state.  stateSetter is not a function');
                 }
+
             })
             .catch(error => {
                 console.log(error);
